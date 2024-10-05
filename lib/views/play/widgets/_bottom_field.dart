@@ -14,40 +14,42 @@ class _BottomField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          DropdownMenu<double>(
-              enableSearch: false,
-              inputDecorationTheme: const InputDecorationTheme(
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.white1)),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.white1))),
-              menuStyle: MenuStyle(
-                  backgroundColor: AppColors.white1.widgetStatePropertyAll),
-              trailingIcon: Icon(
-                Icons.keyboard_arrow_down_sharp,
-                color: AppColors.white1,
-              ),
-              hintText: Strings.playSpeed(),
-              initialSelection: 1,
-              onSelected: (value) async => await cubit.setPlayRate(value),
-              textStyle: AppTypography.bodySmall,
-              dropdownMenuEntries: [
-                DropdownMenuEntry(
-                    value: playerManager.playSpeedVerySlow,
-                    label: '${playerManager.playSpeedVerySlow}'),
-                DropdownMenuEntry(
-                    value: playerManager.playSpeedSlow,
-                    label: '${playerManager.playSpeedSlow}'),
-                DropdownMenuEntry(
-                    value: playerManager.playSpeedMedium,
-                    label: '${playerManager.playSpeedMedium}'),
-                DropdownMenuEntry(
-                    value: playerManager.playSpeedFast,
-                    label: '${playerManager.playSpeedFast}'),
-                DropdownMenuEntry(
-                    value: playerManager.playSpeedVeryFast,
-                    label: '${playerManager.playSpeedVeryFast}'),
-              ]),
+          if (!Platform.isIOS && !Platform.isAndroid)
+            DropdownMenu<double>(
+                width: 80,
+                enableSearch: false,
+                inputDecorationTheme: const InputDecorationTheme(
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.white1)),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.white1))),
+                menuStyle: MenuStyle(
+                    backgroundColor: AppColors.white1.widgetStatePropertyAll),
+                trailingIcon: Icon(
+                  Icons.keyboard_arrow_down_sharp,
+                  color: AppColors.white1,
+                ),
+                hintText: Strings.playSpeed(),
+                initialSelection: 1,
+                onSelected: (value) async => await cubit.setPlayRate(value),
+                textStyle: AppTypography.bodySmall,
+                dropdownMenuEntries: [
+                  DropdownMenuEntry(
+                      value: playerManager.playSpeedVerySlow,
+                      label: '${playerManager.playSpeedVerySlow}'),
+                  DropdownMenuEntry(
+                      value: playerManager.playSpeedSlow,
+                      label: '${playerManager.playSpeedSlow}'),
+                  DropdownMenuEntry(
+                      value: playerManager.playSpeedMedium,
+                      label: '${playerManager.playSpeedMedium}'),
+                  DropdownMenuEntry(
+                      value: playerManager.playSpeedFast,
+                      label: '${playerManager.playSpeedFast}'),
+                  DropdownMenuEntry(
+                      value: playerManager.playSpeedVeryFast,
+                      label: '${playerManager.playSpeedVeryFast}'),
+                ]),
           Spacers.small.horizontal,
           IconButton(
               onPressed: () async {

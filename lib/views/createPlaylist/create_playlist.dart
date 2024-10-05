@@ -138,10 +138,12 @@ class CreatePlaylistScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _mobileSelectionItem(
-                                'From Folder',
-                                Icon(Icons.folder_open_rounded,
-                                    color: Colors.white),
-                                'Select Folder'),
+                              'From Folder',
+                              Icon(Icons.folder_open_rounded,
+                                  color: Colors.white),
+                              'Select Folder',
+                              onPressed: () async => await cubit.openPath(),
+                            ),
                             Container(
                               height: 220,
                               width: 1,
@@ -150,12 +152,14 @@ class CreatePlaylistScreen extends StatelessWidget {
                                   borderRadius: Cutter.medium.all),
                             ),
                             _mobileSelectionItem(
-                                'Empty',
-                                Icon(
-                                  Icons.playlist_add,
-                                  color: Colors.white,
-                                ),
-                                'Create New')
+                              'Empty',
+                              Icon(
+                                Icons.playlist_add,
+                                color: Colors.white,
+                              ),
+                              'Create New',
+                              onPressed: () => cubit.makeChoise(),
+                            )
                           ],
                         ),
                       ),
@@ -170,7 +174,8 @@ class CreatePlaylistScreen extends StatelessWidget {
     );
   }
 
-  Widget _mobileSelectionItem(String text, Icon icon, String buttonText) {
+  Widget _mobileSelectionItem(String text, Icon icon, String buttonText,
+      {void Function()? onPressed}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -182,7 +187,7 @@ class CreatePlaylistScreen extends StatelessWidget {
         ),
         Spacers.medium.vertical,
         CustomFilledButton(
-          onPressed: () => {},
+          onPressed: onPressed,
           text: buttonText,
         ),
       ],
