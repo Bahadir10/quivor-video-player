@@ -1,6 +1,5 @@
-# video_player
+# Quivor Video Player
 
-A new Flutter project.
 
 ## Getting Started
 
