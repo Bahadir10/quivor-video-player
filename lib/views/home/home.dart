@@ -29,7 +29,6 @@ import 'package:path/path.dart' as p;
 part 'widgets/_playlist.dart';
 part 'widgets/_recent_videos.dart';
 part 'widgets/_middle_area.dart';
-part 'widgets/_end_field.dart';
 
 part 'viewModel/cubit/_cubit.dart';
 part 'viewModel/cubit/_state.dart';
@@ -39,16 +38,9 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: MultiBlocProvider(
-        providers: [
-          CustomBlocProvider(
-            create: (context) => _ScreenCubit(context),
-          ),
-          BlocProvider(
-            create: (context) => getIt<RecentVideosCubit>(),
-          )
-        ],
+    return CustomBlocProvider(
+      create: (context) => _ScreenCubit(context),
+      child: SafeArea(
         child: Scaffold(
           drawer: ScreenTypeLayout.builder(
             mobile: (context) {
@@ -57,17 +49,8 @@ class HomeScreen extends StatelessWidget {
               );
             },
           ),
-          endDrawer: ScreenTypeLayout.builder(
-            mobile: (context) {
-              return const Drawer(
-                backgroundColor: AppColors.black2,
-                child: _EndField(),
-              );
-            },
-          ),
           body: BlocBuilder<_ScreenCubit, _ScreenState>(
             builder: (context, state) {
-              final cubit = context.cubit<_ScreenCubit>();
               if (state.isLoading) {
                 return _whenLoading();
               }
@@ -78,21 +61,10 @@ class HomeScreen extends StatelessWidget {
                       const SideBar(),
                       SizedBox(
                           height: double.maxFinite,
-                          width: context.col(6),
+                          width: context.col(10),
                           child: _MiddleArea(
                             playlists: state.playlists!,
                           )),
-                      Padding(
-                        padding: Paddings.medium.all,
-                        child: Container(
-                          height: double.maxFinite,
-                          width: context.col(4) - 32,
-                          decoration: BoxDecoration(
-                              color: AppColors.black3,
-                              borderRadius: Cutter.medium.all),
-                          child: const _EndField(),
-                        ),
-                      ),
                     ],
                   );
                 },

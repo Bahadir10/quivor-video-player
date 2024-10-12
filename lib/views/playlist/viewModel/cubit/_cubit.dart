@@ -44,4 +44,27 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
       Scaffold.of(context).openDrawer();
     }
   }
+
+  FV addVideo() async {
+    final x = await getIt<IFileManager>().getVideoFile();
+
+    if (x != null) {
+      VideoEntity? vid = videos.firstWhereOrNull(
+        (element) => element.path == x,
+      );
+      if (vid.isNotNull) {
+      } else {
+        vid = await getIt<IVideoService>()
+            .createVideo(name: p.basename(x), path: x, playlistId: playlist.id);
+        videos.add(vid);
+        emit(state.copyWith(videos: videos));
+      }
+    }
+  }
+
+  FV removeVideo(VideoEntity entity) async {
+    videos.remove(entity);
+    await getIt<IVideoService>().removeVideo(entity.id);
+    emit(state.copyWith(videos: videos));
+  }
 }

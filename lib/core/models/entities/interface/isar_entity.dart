@@ -1,5 +1,4 @@
 import "package:isar/isar.dart";
-import 'package:nexor/nexor.dart';
 
 abstract class IISarEntity {
   final Id? id;

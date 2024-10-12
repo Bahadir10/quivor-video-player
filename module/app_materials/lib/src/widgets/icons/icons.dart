@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 //     double? size,
 //     Color? color,
 //   }) =>
-//       Icon(
+//       AppIcon(
 //         icon,
 //         size: size ?? this.size,
 //         color: color ?? this.color,
@@ -15,63 +15,83 @@ import 'package:flutter/material.dart';
 @immutable
 final class AppIcons {
   const AppIcons._();
-  static const _color = Colors.white;
-  static const Icon home = Icon(Icons.home);
-  static const Icon search = Icon(Icons.search);
-  static const Icon checked = Icon(
+
+  static const Icon home = AppIcon(
+    Icons.home,
+  );
+  static const Icon search = AppIcon(
+    Icons.search,
+  );
+  static const Icon checked = AppIcon(
     Icons.check,
-    color: _color,
   );
-  static const Icon favorite = Icon(Icons.bookmark);
-  static const Icon play = Icon(
+  static const Icon favorite = AppIcon(
+    Icons.bookmark,
+  );
+  static const Icon play = AppIcon(
     Icons.play_arrow,
-    color: _color,
   );
-  static const Icon pause = Icon(Icons.pause);
-  static const Icon shuffle = Icon(Icons.shuffle);
-  static const Icon repeat = Icon(Icons.repeat);
-  static const Icon previous = Icon(Icons.skip_previous);
-  static const Icon next = Icon(Icons.skip_next);
-  static const Icon repeat_one = Icon(Icons.repeat_one);
-  //static const Icon repeat_all = Icon(Icons.repeat_all);
-  static const Icon settings = Icon(Icons.settings);
-  static const Icon close = Icon(Icons.close);
-  static const Icon volume_up = Icon(Icons.volume_up);
-  static const Icon volume_down = Icon(Icons.volume_down);
-  static const Icon volume_mute = Icon(Icons.volume_mute);
-  static const Icon playlistAdd = Icon(
-    Icons.playlist_add,
-    color: _color,
+  static const Icon pause = AppIcon(
+    Icons.pause,
   );
-  static const Icon playlist_remove = Icon(Icons.playlist_remove);
-  static const Icon playlist_play = Icon(Icons.playlist_play);
-  static const Icon skipNext = Icon(
-    Icons.skip_next_rounded,
-    color: _color,
+  static const Icon shuffle = AppIcon(
+    Icons.shuffle,
   );
-  static const Icon backward10 = Icon(
-    Icons.replay_10_rounded,
-    color: _color,
+  static const Icon repeat = AppIcon(
+    Icons.repeat,
   );
-  static const Icon skipPrevious = Icon(
-    Icons.skip_previous_rounded,
-    color: _color,
+  static const Icon previous = AppIcon(
+    Icons.skip_previous,
   );
-  static const Icon forward10 = Icon(
-    Icons.forward_10,
-    color: _color,
-  );
-  static const Icon equalizer = Icon(
-    Icons.equalizer,
-    color: _color,
-  );
-  static const Icon menu = Icon(
-    Icons.menu,
-    color: _color,
+  static const Icon next = AppIcon(
+    Icons.skip_next,
   );
 
-  static const Icon addBoxRounded = Icon(
-    Icons.add_box_rounded,
-    color: _color,
+  static const Icon settings = AppIcon(
+    Icons.settings,
   );
+  static const Icon close = AppIcon(
+    Icons.close,
+  );
+
+  static const Icon playlistAdd = AppIcon(
+    Icons.playlist_add,
+  );
+
+  static const Icon skipNext = AppIcon(
+    Icons.skip_next_rounded,
+  );
+  static const Icon backward10 = AppIcon(
+    Icons.replay_10_rounded,
+  );
+  static const Icon skipPrevious = AppIcon(
+    Icons.skip_previous_rounded,
+  );
+  static const Icon forward10 = AppIcon(
+    Icons.forward_10,
+  );
+  static const Icon equalizer = AppIcon(
+    Icons.equalizer,
+  );
+  static const Icon menu = AppIcon(
+    Icons.menu,
+  );
+
+  static const Icon addBoxRounded = AppIcon(
+    Icons.add_box_rounded,
+  );
+
+  static const Icon delete = AppIcon(
+    Icons.delete,
+  );
+  static const Icon clear = AppIcon(
+    Icons.clear,
+  );
+  static const Icon arrowDown = AppIcon(Icons.keyboard_arrow_down_sharp);
+
+  static const Icon folderOpen = AppIcon(Icons.folder_open_rounded);
+}
+
+final class AppIcon extends Icon {
+  const AppIcon(super.icon, {super.key, super.color = Colors.white});
 }

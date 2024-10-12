@@ -8,4 +8,5 @@ abstract class IPlaylistService {
   Future<List<Playlist>> searchPlaylists(String input);
   Future<PlaylistProgressResponseModel> getPlaylistState(int id);
   Future<List<PlaylistStateResponseModel>> getPlaylistStates();
+  Future removePlaylist(int id);
 }

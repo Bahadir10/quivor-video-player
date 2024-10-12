@@ -3,7 +3,13 @@ import 'package:flutter/widgets.dart';
 import 'package:nexor/nexor.dart';
 import 'package:quivor/core/enum/route.dart';
 import 'package:quivor/core/extensions/build_context.dart';
+import 'package:quivor/core/fileManager/interface.dart';
+import 'package:quivor/core/models/entities/video.dart';
+import 'package:quivor/core/service/interface/video.dart';
+import 'package:quivor/getit_settings.dart';
 import 'package:quivor/utils/strings.dart';
+import 'package:quivor/views/play/play.dart';
+import 'package:path/path.dart' as p;
 
 class SideBar extends StatelessWidget {
   const SideBar({super.key});
@@ -12,7 +18,6 @@ class SideBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        //height: double.maxFinite,
         width: context.col(2),
         color: AppColors.black3,
         child: Column(
@@ -21,22 +26,10 @@ class SideBar extends StatelessWidget {
             CustomIconTextButton(
               icon: AppIcons.home,
               text: 'Home',
-              onPressed: () => context.go(AppRoute.home),
+              onPressed: () => navigate(context, AppRoute.home),
             ),
-            // CustomIconTextButton(
-            //   icon: AppIcons.checked,
-            //   text: 'Watched',
-            // ),
-            // CustomIconTextButton(
-            //   icon: AppIcons.favorite,
-            //   text: 'Favorites',
-            // ),
-            // CustomIconTextButton(
-            //   icon: AppIcons.play,
-            //   text: 'Open a video',
-            // ),
             CustomIconTextButton(
-              onPressed: () => context.go(AppRoute.createPlaylist),
+              onPressed: () => navigate(context, AppRoute.createPlaylist),
               icon: AppIcons.playlistAdd,
               text: 'Create playlist',
             ),
@@ -55,7 +48,6 @@ class SideBar extends StatelessWidget {
                           color: AppColors.black4)
                     ]),
                 child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Spacers.medium.vertical,
                     AppIcons.addBoxRounded.copyWith(size: 64),
@@ -64,14 +56,27 @@ class SideBar extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Spacer(),
                           CustomTextButton(
                               text: Strings.openFile(),
-                              onPressed:
-                                  () {} // async => await cubit.openFile(),
-                              ),
+                              onPressed: () async {
+                                final x =
+                                    await getIt<IFileManager>().getVideoFile();
 
-                          // Spacer()
+                                if (x != null) {
+                                  VideoEntity? vid =
+                                      await getIt<IVideoService>()
+                                          .getVideoByPathOrNull(x);
+                                  if (vid.isNotNull) {
+                                  } else {
+                                    vid = await getIt<IVideoService>()
+                                        .createVideo(
+                                            name: p.basename(x), path: x);
+                                  }
+                                  context.go(AppRoute.player,
+                                      data:
+                                          PlayScreenParameters(paths: [vid!]));
+                                }
+                              }),
                         ],
                       ),
                     ),

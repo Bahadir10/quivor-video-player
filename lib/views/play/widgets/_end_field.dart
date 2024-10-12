@@ -14,16 +14,20 @@ class _EndField extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.cubit<_ScreenCubit>();
     return Container(
-      width: context.width,
+      width: context.width * 0.9,
       color: AppColors.black2,
       child: ListView(
         children: [
           Spacers.medium.vertical,
           Padding(
             padding: Paddings.medium.horizontal,
-            child: Text(
-              text,
-              style: AppTypography.headingSmall,
+            child: SizedBox(
+              width: context.width * 0.9 - 32,
+              child: Text(
+                text,
+                style: AppTypography.headingSmall,
+                overflow: TextOverflow.visible,
+              ),
             ),
           ),
           if (videos.length > 1)
@@ -45,11 +49,9 @@ class _EndField extends StatelessWidget {
                             ),
                             SizedBox(
                               width: 250,
-                              child: Flexible(
-                                child: Text(video.name,
-                                    overflow: TextOverflow.visible,
-                                    style: AppTypography.bodyMedium),
-                              ),
+                              child: Text(video.name,
+                                  overflow: TextOverflow.visible,
+                                  style: AppTypography.bodyMedium),
                             ),
                           ],
                         ),

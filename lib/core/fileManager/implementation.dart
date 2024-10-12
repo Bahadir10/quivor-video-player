@@ -11,7 +11,6 @@ class FileManager extends IFileManager {
 
     List<Directory> directories1 = [];
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-    //print(selectedDirectory);
 
     if (selectedDirectory != null) {
       final directory = Directory(selectedDirectory);
@@ -48,7 +47,6 @@ class FileManager extends IFileManager {
   Future<String?> getVideoFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.video,
-      // allowMultiple: true,
     );
     if (result != null) {
       return result.files.first.path;

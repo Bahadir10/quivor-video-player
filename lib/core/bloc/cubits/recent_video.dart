@@ -1,6 +1,5 @@
-import 'package:nexor/src/core/typedef/future.dart';
+import 'package:nexor/nexor.dart';
 import 'package:quivor/core/bloc/base_cubit.dart';
-import 'package:quivor/core/models/entities/recent.dart';
 import 'package:quivor/core/models/entities/video.dart';
 import 'package:quivor/core/service/interface/video.dart';
 import 'package:quivor/getit_settings.dart';
@@ -16,7 +15,7 @@ final class RecentVideosCubit extends BaseCubit<List<VideoEntity>> {
   FV update(VideoEntity entity) async {
     await getIt<IVideoService>().createRecent(entity);
     state.removeWhere(
-      (e) => e == entity,
+      (e) => e.id == entity.id,
     );
     final result = [entity, ...state];
     emit(result);

@@ -43,7 +43,6 @@ final class _ScreenCubit extends Cubit<_ScreenState> {
       if (result!.videoPaths.isEmpty) {
         return;
       }
-      //File filex = File(result.mainDirectory);
       playlistNameController.text = p.basename(result.mainDirectory);
       for (final x in result.videoPaths) {
         File file = File(x);
@@ -79,5 +78,13 @@ final class _ScreenCubit extends Cubit<_ScreenState> {
               watchedCount: 0,
               progressPercentage: 0),
         ));
+  }
+
+  void toggleSideBar(BuildContext context) {
+    if (context.width > 800) {
+      emit(state.copyWith(isSideBarOpen: !state.isSideBarOpen));
+    } else {
+      Scaffold.of(context).openDrawer();
+    }
   }
 }

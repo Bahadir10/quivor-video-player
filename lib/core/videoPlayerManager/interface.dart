@@ -15,14 +15,17 @@ abstract class IVideoPlayerManager {
   FV seek(int seconds);
   FV playOrPause();
   FV setVolume(double value);
-  //Stream<bool> is
   FV setShuffle(bool value);
   FV play();
   FV pause();
+
   Duration get position;
   dynamic get controller;
   bool get isPlaying;
   double get volume;
+
+  Stream<bool> get isCompleted;
+
   final double playSpeedVerySlow = 0.25;
   final double playSpeedSlow = 0.50;
   final double playSpeedMedium = 1.0;

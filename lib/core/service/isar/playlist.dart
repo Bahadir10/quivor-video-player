@@ -50,6 +50,7 @@ final class IsarPlaylistService extends IPlaylistService {
         length: length);
   }
 
+  @override
   Future<List<PlaylistStateResponseModel>> getPlaylistStates() async {
     final playlists = await isar.playlists.where().findAll();
     final videos =
@@ -78,5 +79,13 @@ final class IsarPlaylistService extends IPlaylistService {
             progressPercentage: percentage);
       },
     ).toList();
+  }
+
+  @override
+  Future removePlaylist(int id) async {
+    await isar.writeTxn(() async {
+      await isar.playlists.delete(id);
+      await isar.videoEntitys.filter().playlistIdEqualTo(id).deleteAll();
+    });
   }
 }

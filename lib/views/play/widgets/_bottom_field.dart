@@ -15,24 +15,12 @@ class _BottomField extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (!Platform.isIOS && !Platform.isAndroid)
-            DropdownMenu<double>(
+            CustomDropdown<double>(
                 width: 80,
                 enableSearch: false,
-                inputDecorationTheme: const InputDecorationTheme(
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.white1)),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColors.white1))),
-                menuStyle: MenuStyle(
-                    backgroundColor: AppColors.white1.widgetStatePropertyAll),
-                trailingIcon: Icon(
-                  Icons.keyboard_arrow_down_sharp,
-                  color: AppColors.white1,
-                ),
                 hintText: Strings.playSpeed(),
                 initialSelection: 1,
                 onSelected: (value) async => await cubit.setPlayRate(value),
-                textStyle: AppTypography.bodySmall,
                 dropdownMenuEntries: [
                   DropdownMenuEntry(
                       value: playerManager.playSpeedVerySlow,
@@ -63,23 +51,6 @@ class _BottomField extends StatelessWidget {
           IconButton(
             icon: AppIcons.backward10,
             onPressed: () async => await playerManager.seekBackward(),
-          ),
-          Spacers.small.horizontal,
-          Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.white1,
-            ),
-            child: Padding(
-              padding: Paddings.small.all,
-              child: Builder(builder: (context) {
-                return IconButton(
-                    onPressed: () async => await playerManager.playOrPause(),
-                    icon: state.isPlaying == true
-                        ? AppIcons.pause.copyWith(color: AppColors.black2)
-                        : AppIcons.play.copyWith(color: AppColors.black2));
-              }),
-            ),
           ),
           Spacers.small.horizontal,
           IconButton(

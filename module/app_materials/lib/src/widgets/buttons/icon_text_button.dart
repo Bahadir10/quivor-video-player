@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_materials/app_materials.dart';
 
 class CustomIconTextButton extends StatelessWidget {
   final String text;
@@ -13,7 +14,16 @@ class CustomIconTextButton extends StatelessWidget {
       onPressed: onPressed,
       label: Text(text),
       icon: icon,
-      style: ButtonStyle(foregroundColor: WidgetStatePropertyAll(Colors.white)),
+      style: ButtonStyle(
+          overlayColor: WidgetStateProperty.resolveWith<Color>(
+            (states) {
+              if (states.contains(WidgetState.hovered)) {
+                return AppColors.grey3;
+              }
+              return AppColors.grey4;
+            },
+          ),
+          foregroundColor: const WidgetStatePropertyAll(AppColors.white1)),
     );
   }
 }

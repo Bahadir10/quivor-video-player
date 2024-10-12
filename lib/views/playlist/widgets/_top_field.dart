@@ -15,46 +15,66 @@ class _TopField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.cubit<_ScreenCubit>();
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
+      runAlignment: WrapAlignment.center,
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.start,
       children: [
-        Row(
+        IconButton(
+          padding: EdgeInsets.zero,
+          icon: AppIcons.menu,
+          onPressed: () => cubit.toggleSideBar(context),
+        ),
+        Spacers.medium.horizontal,
+        Column(
           children: [
-            IconButton(
-              padding: EdgeInsets.zero,
-              icon: AppIcons.menu,
-              onPressed: () => cubit.toggleSideBar(context),
-            ),
-            Spacers.medium.horizontal,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 15,
-                  width: 200,
-                  child: LinearProgressIndicator(
-                    color: AppColors.blue1,
-                    //color: Color(0xFF1E3E62),
-                    //backgroundColor: Color(0xFF6A9AB0),
-                    backgroundColor: AppColors.white1,
-                    borderRadius: Cutter.small.all,
-                    value: percentage / 100,
-                  ),
-                ),
-                Spacers.medium.horizontal,
-                Text(
-                  '$watchedCount/${videos.length}',
-                  style: AppTypography.bodyMedium,
-                ),
-                Spacers.small.horizontal,
-                Text(
-                  '% ${percentage.toStringAsFixed(2)}',
-                  style: AppTypography.bodyMedium,
-                )
-              ],
+            Spacers.low.vertical,
+            Text(
+              playlist.name,
+              style: AppTypography.bodyLarge,
             ),
           ],
         ),
+        Spacers.medium.horizontal,
+        Column(
+          children: [
+            Spacers.small.vertical,
+            SizedBox(
+              height: 15,
+              width: 200,
+              child: LinearProgressIndicator(
+                color: AppColors.blue1,
+                backgroundColor: AppColors.white1,
+                borderRadius: Cutter.small.all,
+                value: percentage / 100,
+              ),
+            ),
+          ],
+        ),
+        Spacers.medium.horizontal,
+        Column(
+          children: [
+            Spacers.small.vertical,
+            Text(
+              '$watchedCount/${videos.length}',
+              style: AppTypography.bodyMedium,
+            ),
+          ],
+        ),
+        Spacers.small.horizontal,
+        Column(
+          children: [
+            Spacers.small.vertical,
+            Text(
+              '% ${percentage.toStringAsFixed(2)}',
+              style: AppTypography.bodyMedium,
+            ),
+          ],
+        ),
+        Spacers.medium.horizontal,
+        IconButton(
+            onPressed: () async => await cubit.addVideo(),
+            icon: AppIcons.addBoxRounded),
         CustomTextButton(
           text: Strings.continueT(),
           onPressed: () {

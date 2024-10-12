@@ -25,6 +25,10 @@ class _VideosField extends StatelessWidget {
               video.name,
               style: AppTypography.bodyMedium,
             ),
+            trailing: IconButton(
+              icon: AppIcons.clear,
+              onPressed: () async => await cubit.removeVideo(video),
+            ),
             onTap: () async {
               context.go(AppRoute.player,
                   data: PlayScreenParameters(

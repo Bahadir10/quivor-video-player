@@ -43,6 +43,11 @@ class VideoPlayerManager extends IVideoPlayerManager {
   FV open(List<VideoEntity> videos) async {
     final playable = Playlist(videos.map((x) => Media(x.path)).toList());
     await _player.open(playable);
+    _player.stream.track.listen(
+      (event) async {
+        await _openSubtitle();
+      },
+    );
   }
 
   @override
@@ -94,5 +99,18 @@ class VideoPlayerManager extends IVideoPlayerManager {
   @override
   FV play() async {
     await _player.play();
+  }
+
+  @override
+  Stream<bool> get isCompleted => _player.stream.completed;
+
+  FV _openSubtitle() async {
+    final x = _player.state.track.video.title;
+    final z = x?.lastIndexOf('.');
+    final y = x?.substring(0, z);
+    final res = '$y.srt';
+    try {
+      await _player.setSubtitleTrack(SubtitleTrack.data(res));
+    } catch (e) {}
   }
 }

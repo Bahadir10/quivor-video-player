@@ -32,15 +32,6 @@ class _MiddleArea extends StatelessWidget {
                   onChanged: (value) async => cubit.search(value),
                 ),
               ),
-              if (isMobile)
-                Row(
-                  children: [
-                    Spacers.small.horizontal,
-                    IconButton(
-                        onPressed: () => Scaffold.of(context).openEndDrawer(),
-                        icon: AppIcons.playlistAdd),
-                  ],
-                ),
             ],
           ),
         ),

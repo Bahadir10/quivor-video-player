@@ -96,6 +96,6 @@ flutter:
   assets: 
       #- assets/svg/
       #- assets/json/
-      #- assets/images/
+      - assets/images/
       #- assets/translations/
       - assets/fonts/

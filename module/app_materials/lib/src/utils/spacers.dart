@@ -10,14 +10,6 @@ enum Spacers {
 
   const Spacers(this.value);
 
-  // static Map<String, double> get standarts {
-  //   final Map<String, double> result = {};
-
-  //   SpacerTheme.values.forEach((e) => result.addAll({e.name: e.value}));
-
-  //   return result;
-  // }
-
   String call() => name;
 
   SizedBox get all => SizedBox(
@@ -34,7 +26,6 @@ enum Spacers {
 }
 
 enum Paddings {
-  //none(0),
   low(4),
   small(8),
   medium(16),

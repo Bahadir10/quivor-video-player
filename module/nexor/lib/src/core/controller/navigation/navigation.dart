@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 abstract class INavigationController {
   final Widget? Function(String route, dynamic data) routes;
 
-//  final void Function(String route, dynamic data);
+
   INavigationController(this.routes);
   void go(String route, BuildContext context, {dynamic data});
   void goOffAll(String route, BuildContext context, {dynamic data});

@@ -19,6 +19,7 @@ import 'package:quivor/core/videoPlayerManager/interface.dart';
 import 'package:quivor/getit_settings.dart';
 import 'package:quivor/utils/strings.dart';
 import 'package:quivor/widgets/check_box.dart';
+import 'package:quivor/widgets/dropdown.dart';
 import 'package:quivor/widgets/side_bar.dart';
 import 'package:quivor/widgets/slider.dart';
 import 'package:quivor/widgets/video_player.dart';
@@ -66,13 +67,12 @@ class _PlayScreenState extends State<PlayScreen> {
           _ScreenCubit(widget.paths, _playerManager, startIndex),
       child: Scaffold(
           drawer: context.width < 600
-              ? Drawer(
+              ? const Drawer(
                   child: SideBar(),
                 )
               : null,
           endDrawer: BlocBuilder<_ScreenCubit, _ScreenState>(
             builder: (context, state) {
-              final cubit = context.cubit<_ScreenCubit>();
               return _EndField(
                 videos: state.videos,
                 playingId: state.currentPlaying?.id,
@@ -101,7 +101,6 @@ class _PlayScreenState extends State<PlayScreen> {
           ),
           body: BlocBuilder<_ScreenCubit, _ScreenState>(
             builder: (context, state) {
-              final cubit = context.cubit<_ScreenCubit>();
               return Row(
                 children: [
                   if (state.isSideBarOpen) SideBar(),

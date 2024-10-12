@@ -19,10 +19,9 @@ class CustomTextField extends StatelessWidget {
       style: AppTypography.bodyMedium,
       decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: AppTypography.bodySmall.copyWith(color: Color(0xFFb7b7b7)),
+          hintStyle: AppTypography.bodySmall.copyWith(color: AppColors.grey4),
           filled: true,
-          fillColor: Color(0xFF2c2c2c),
-          //hintText: 'Enter your text here',
+          fillColor: AppColors.black3,
           border: OutlineInputBorder(
             borderRadius: Cutter.small.all,
             borderSide: BorderSide(color: Colors.grey),

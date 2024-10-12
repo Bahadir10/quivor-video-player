@@ -44,7 +44,6 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
   }
 
   FV goPlaylistScreen(PlaylistStateResponseModel playlist) async {
-    final vids = await getIt<IVideoService>().playlistVideos(playlist.id);
     context.go(AppRoute.playlist,
         data: PlaylistScreenParameters(
           playlist: playlist,
@@ -53,5 +52,11 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
 
   FV playRecentVideo(VideoEntity entity) async {
     context.go(AppRoute.player, data: PlayScreenParameters(paths: [entity]));
+  }
+
+  FV removePlaylist(int id) async {
+    await getIt<IPlaylistService>().removePlaylist(id);
+    playlists.removeWhere((e) => e.id == id);
+    safeEmit(state.copyWith(playlists: playlists));
   }
 }

@@ -1,12 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:app_materials/app_materials.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nexor/nexor.dart';
 import 'package:quivor/core/bloc/base_cubit.dart';
 import 'package:quivor/core/enum/route.dart';
 import 'package:quivor/core/extensions/build_context.dart';
+import 'package:quivor/core/fileManager/interface.dart';
 
 import 'package:quivor/core/models/entities/video.dart';
 import 'package:quivor/core/service/interface/video.dart';
@@ -16,6 +18,8 @@ import 'package:quivor/utils/strings.dart';
 import 'package:quivor/views/play/play.dart';
 import 'package:quivor/widgets/check_box.dart';
 import 'package:quivor/widgets/side_bar.dart';
+import 'package:path/path.dart' as p;
+
 part 'viewModel/cubit/_cubit.dart';
 part 'viewModel/cubit/_state.dart';
 
@@ -39,7 +43,7 @@ class PlaylistScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: context.width < 600
-          ? Drawer(
+          ? const Drawer(
               child: SideBar(),
             )
           : null,
@@ -50,7 +54,7 @@ class PlaylistScreen extends StatelessWidget {
         child: BlocBuilder<_ScreenCubit, _ScreenState>(
           builder: (context, state) {
             if (state.isLoading) {
-              return Center(
+              return const Center(
                   child: CircularProgressIndicator(
                 color: Colors.white,
               ));

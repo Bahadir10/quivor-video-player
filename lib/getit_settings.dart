@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:nexor/nexor.dart';
 import 'package:quivor/core/bloc/cubits/recent_video.dart';
-import 'package:quivor/core/data/user_data_manager.dart';
-import 'package:quivor/core/enum/route.dart';
+
 import 'package:quivor/core/fileManager/implementation.dart';
 import 'package:quivor/core/fileManager/interface.dart';
 
@@ -21,12 +20,12 @@ final getIt = GetIt.instance;
 final class GetitSettings {
   Future<void> init() async {
     getIt
-      // CUBITS
 
       // SERVICE
       ..registerSingleton<IPlaylistService>(IsarPlaylistService())
       ..registerSingleton<IVideoService>(IsarVideoService())
       ..registerSingleton<IFileManager>(FileManager())
+      // CUBITS
       ..registerSingleton<RecentVideosCubit>(RecentVideosCubit()..init())
 
       // CONTROLLERS

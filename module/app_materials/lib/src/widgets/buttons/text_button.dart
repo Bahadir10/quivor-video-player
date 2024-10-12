@@ -1,3 +1,4 @@
+import 'package:app_materials/app_materials.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextButton extends StatelessWidget {
@@ -11,8 +12,15 @@ class CustomTextButton extends StatelessWidget {
       onPressed: onPressed,
       child: Text(text),
       style: ButtonStyle(
-        foregroundColor: WidgetStatePropertyAll(Color(0xFFFFFFFF)),
-        // backgroundColor: WidgetStatePropertyAll(Color(0xFF000000))
+        foregroundColor: const WidgetStatePropertyAll(AppColors.white1),
+        overlayColor: WidgetStateProperty.resolveWith<Color>(
+          (states) {
+            if (states.contains(WidgetState.hovered)) {
+              return AppColors.grey3;
+            }
+            return AppColors.grey4;
+          },
+        ),
       ),
     );
   }

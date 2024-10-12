@@ -80,4 +80,11 @@ final class IsarVideoService extends IVideoService {
   Future<VideoEntity?> getVideoByPathOrNull(String path) async {
     return await isar.videoEntitys.filter().pathEqualTo(path).findFirst();
   }
+
+  @override
+  Future removeVideo(int id) async {
+    await isar.writeTxn(() async {
+      await isar.videoEntitys.delete(id);
+    });
+  }
 }

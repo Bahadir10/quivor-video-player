@@ -41,14 +41,14 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
     await player.setVolume(volume);
     await getIt<RecentVideosCubit>().update(vids.first);
 
-    // player.stream.completed.listen(
-    //   (event) async {
-    //     if (event) {
-    //       await toggleWatch(_currentEntity);
-    //       await playNext();
-    //     }
-    //   },
-    // );
+    player.isCompleted.listen(
+      (event) async {
+        if (event) {
+          await toggleWatch(_currentEntity);
+          await playNext();
+        }
+      },
+    );
 
     final x = Stream<VideoEntity>.periodic(
       const Duration(seconds: 30),
@@ -64,9 +64,9 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
         final i = vids.indexWhere(
           (e) => e.id == event.id,
         );
-        vids.remove(i);
-        vids.insert(i, _currentEntity);
         _currentEntity = event;
+        vids.removeAt(i);
+        vids.insert(i, _currentEntity);
         await getIt<IVideoService>().updateVideo(_currentEntity);
       },
     );
@@ -125,6 +125,7 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
 
   FV setVolume(double volume) async {
     await player.setVolume(volume);
+    await UserDataManager().setVolume(volume);
     emit(state.copyWith(volume: volume));
   }
 

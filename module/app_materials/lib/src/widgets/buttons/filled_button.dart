@@ -1,3 +1,4 @@
+import 'package:app_materials/app_materials.dart';
 import 'package:flutter/material.dart';
 
 class CustomFilledButton extends StatelessWidget {
@@ -11,8 +12,16 @@ class CustomFilledButton extends StatelessWidget {
       onPressed: onPressed,
       child: Text(text),
       style: ButtonStyle(
-          foregroundColor: WidgetStatePropertyAll(Color(0xFFFFFFFF)),
-          backgroundColor: WidgetStatePropertyAll(Color(0xFF000000))),
+          overlayColor: WidgetStateProperty.resolveWith<Color>(
+            (states) {
+              if (states.contains(WidgetState.hovered)) {
+                return AppColors.grey3;
+              }
+              return AppColors.grey4;
+            },
+          ),
+          foregroundColor: WidgetStatePropertyAll(AppColors.white1),
+          backgroundColor: WidgetStatePropertyAll(AppColors.black1)),
     );
   }
 }
