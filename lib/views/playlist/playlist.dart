@@ -41,63 +41,62 @@ class PlaylistScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: context.width < 600
-          ? const Drawer(
-              child: SideBar(),
-            )
-          : null,
-      body: BlocProvider(
-        create: (context) => _ScreenCubit(
-          playlist: playlist,
-        )..init(),
-        child: BlocBuilder<_ScreenCubit, _ScreenState>(
-          builder: (context, state) {
-            if (state.isLoading) {
-              return const Center(
-                  child: CircularProgressIndicator(
-                color: Colors.white,
-              ));
-            }
+    return SafeArea(
+      child: Scaffold(
+        drawer: context.width < 600
+            ? const Drawer(
+                child: SideBar(),
+              )
+            : null,
+        body: BlocProvider(
+          create: (context) => _ScreenCubit(
+            playlist: playlist,
+          )..init(),
+          child: BlocBuilder<_ScreenCubit, _ScreenState>(
+            builder: (context, state) {
+              if (state.isLoading) {
+                return const Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.white,
+                ));
+              }
 
-            final videos = state.videos!;
-            // final int wathcedCount = videos.where((x) => x.isWatched).length;
-            // final p = wathcedCount / videos.length * 100;
-            // final percentage = p.isNaN ? 0.0 : p;
-            final cubit = context.cubit<_ScreenCubit>();
-            return Row(
-              children: [
-                if (state.isSideBarOpen) const SideBar(),
-                if (state.isSideBarOpen) Spacers.small.horizontal,
-                Flexible(
-                  child: Padding(
-                    padding: Paddings.medium.horizontal,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Spacers.medium.vertical,
-                        _TopField(
-                          percentage: playlist.progressPercentage,
-                          playlist: playlist,
-                          videos: videos,
-                          watchedCount: playlist.watchedCount,
-                        ),
-                        Spacers.small.vertical,
-                        CustomTextField(
-                          hintText: Strings.search(),
-                          onChanged: (value) async => cubit.search(value),
-                        ),
-                        _VideosField(
-                          playlist: playlist,
-                          videos: videos,
-                        ),
-                      ],
+              final videos = state.videos!;
+              final cubit = context.cubit<_ScreenCubit>();
+              return Row(
+                children: [
+                  if (state.isSideBarOpen) const SideBar(),
+                  if (state.isSideBarOpen) Spacers.small.horizontal,
+                  Flexible(
+                    child: Padding(
+                      padding: Paddings.medium.horizontal,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Spacers.medium.vertical,
+                          _TopField(
+                            percentage: playlist.progressPercentage,
+                            playlist: playlist,
+                            videos: videos,
+                            watchedCount: playlist.watchedCount,
+                          ),
+                          Spacers.small.vertical,
+                          CustomTextField(
+                            hintText: Strings.search(),
+                            onChanged: (value) async => cubit.search(value),
+                          ),
+                          _VideosField(
+                            playlist: playlist,
+                            videos: videos,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

@@ -22,9 +22,13 @@ class CustomTextField extends StatelessWidget {
           hintStyle: AppTypography.bodySmall.copyWith(color: AppColors.grey4),
           filled: true,
           fillColor: AppColors.black3,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: Cutter.small.all,
+            borderSide: BorderSide(color: AppColors.blue1),
+          ),
           border: OutlineInputBorder(
             borderRadius: Cutter.small.all,
-            borderSide: BorderSide(color: Colors.grey),
+            borderSide: BorderSide(color: AppColors.grey1),
           )),
       onChanged: (value) {
         if (onChanged != null) {

@@ -48,7 +48,7 @@ class _EndField extends StatelessWidget {
                                   await cubit.toggleWatch(video),
                             ),
                             SizedBox(
-                              width: 250,
+                              width: 200,
                               child: Text(video.name,
                                   overflow: TextOverflow.visible,
                                   style: AppTypography.bodyMedium),

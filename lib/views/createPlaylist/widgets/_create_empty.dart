@@ -9,8 +9,11 @@ class _CreateEmptyView extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CustomTextField(
-          onChanged: cubit.updatePlaylistName,
+        Padding(
+          padding: Paddings.medium.horizontal,
+          child: CustomTextField(
+            onChanged: cubit.updatePlaylistName,
+          ),
         ),
         context.spacer.vertical(AppStandarts.high),
         CustomFilledButton(
