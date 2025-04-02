@@ -1,33 +1,35 @@
 name: quivor
 description: "A new Flutter project."
 
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
-  sdk: '>=3.4.1 <4.0.0'
-
+  sdk: ">=3.4.1 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-    
+
   # CACHE
   shared_preferences: ^2.3.2
   isar: 3.1.0+1
-  isar_flutter_libs: 3.1.0+1
+  #isar_flutter_libs: 3.1.0+1
+
+  isar_flutter_libs:
+    git:
+      url: https://github.com/MrLittleWhite/isar_flutter_libs.git
+
   # STATE MANAGMENT
-  flutter_bloc: ^8.1.6
+  flutter_bloc: ^9.1.0
   # UI
   media_kit: ^1.1.11
-  media_kit_video: ^1.2.5 
-  media_kit_libs_video: ^1.0.5 
+  media_kit_video: ^1.2.5
+  media_kit_libs_video: ^1.0.5
   responsive_builder: ^0.7.1
   google_fonts: ^6.2.1
-  file_picker: ^8.1.2
- 
+  file_picker: ^9.2.1
 
   cupertino_icons: ^1.0.6
 
@@ -36,8 +38,7 @@ dependencies:
     path: module/app_materials
   nexor:
     path: module/nexor
-  
-  
+
   path_provider: ^2.1.4
   collection: ^1.18.0
   get_it: ^8.0.0
@@ -45,19 +46,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   isar_generator: 3.1.0+1
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
   build_runner: ^2.4.11
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
 
-# The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -93,9 +85,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-  assets: 
-      #- assets/svg/
-      #- assets/json/
-      - assets/images/
-      #- assets/translations/
-      - assets/fonts/
+  assets:
+    #- assets/svg/
+    #- assets/json/
+    - assets/images/
+    #- assets/translations/
+    - assets/fonts/

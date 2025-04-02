@@ -15,21 +15,34 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
   }
 
   FV handleWatchState(VideoEntity entity) async {
+    emit(state.copyWith(isLoading: true));
     final index = videos.indexOf(entity);
     final x = entity.copyWith(isWatched: !entity.isWatched);
+    final watch = x.isWatched
+        ? state.playlist.watchedCount + 1
+        : state.playlist.watchedCount - 1;
+    final p = playlist.copyWith(
+      watchedCount: watch,
+      progressPercentage: Helper.getPercentage(
+        max: state.videos!.length.toDouble(),
+        progress: watch.toDouble(),
+      ),
+    );
     await getIt<IVideoService>().updateVideo(x);
     videos.removeAt(index);
     videos.insert(index, x);
-    emit(state.copyWith(videos: videos));
+    emit(state.copyWith(videos: videos, playlist: p, isLoading: false));
   }
 
   FV search(String input) async {
+    emit(state.copyWith(isLoading: true));
     if (input.isEmpty) {
-      emit(state.copyWith(videos: videos));
+      emit(state.copyWith(videos: videos, isLoading: false));
       return;
     }
 
     emit(state.copyWith(
+        isLoading: false,
         videos: videos
             .where(
               (e) => e.name.toLowerCase().contains(input.toLowerCase()),
@@ -63,8 +76,9 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
   }
 
   FV removeVideo(VideoEntity entity) async {
+    emit(state.copyWith(isLoading: true));
     videos.remove(entity);
     await getIt<IVideoService>().removeVideo(entity.id);
-    emit(state.copyWith(videos: videos));
+    emit(state.copyWith(videos: videos, isLoading: false));
   }
 }

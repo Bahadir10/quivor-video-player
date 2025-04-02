@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "C:\\Users\\Bahadir\\Documents\\flutter\\packages\\flutter_tools\\gradle\\src\\main\\groovy\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\Bahadir\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\Bahadir\\flutter-projects\\video_player\\android\\app\\.cxx\\RelWithDebInfo\\131f6r1z\\armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\Bahadir\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\Bahadir\\flutter-projects\\video_player\\android\\app\\.cxx\\RelWithDebInfo\\131f6r1z\\armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

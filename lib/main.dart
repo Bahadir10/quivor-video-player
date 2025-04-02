@@ -33,6 +33,13 @@ class Quivor extends StatelessWidget {
       create: (BuildContext context) => getIt<RecentVideosCubit>(),
       child: MaterialApp(
         theme: ThemeData(
+            pageTransitionsTheme: PageTransitionsTheme(
+              builders:
+                  Map<TargetPlatform, PageTransitionsBuilder>.fromIterable(
+                TargetPlatform.values,
+                value: (_) => const FadeUpwardsPageTransitionsBuilder(),
+              ),
+            ),
             extensions: [NexorSpacerThemeExtension(standarts: standarts)],
             scaffoldBackgroundColor: AppColors.black2,
             appBarTheme: const AppBarTheme(

@@ -14,6 +14,7 @@ import 'package:quivor/core/models/entities/video.dart';
 import 'package:quivor/core/service/interface/video.dart';
 import 'package:quivor/core/service/responseModel/playlist_state.dart';
 import 'package:quivor/getit_settings.dart';
+import 'package:quivor/utils/helper.dart' show Helper;
 import 'package:quivor/utils/strings.dart';
 import 'package:quivor/views/play/play.dart';
 import 'package:quivor/widgets/check_box.dart';
@@ -75,10 +76,10 @@ class PlaylistScreen extends StatelessWidget {
                         children: [
                           Spacers.medium.vertical,
                           _TopField(
-                            percentage: playlist.progressPercentage,
-                            playlist: playlist,
+                            percentage: state.playlist.progressPercentage,
+                            playlist: state.playlist,
                             videos: videos,
-                            watchedCount: playlist.watchedCount,
+                            watchedCount: state.playlist.watchedCount,
                           ),
                           Spacers.small.vertical,
                           CustomTextField(
@@ -86,8 +87,8 @@ class PlaylistScreen extends StatelessWidget {
                             onChanged: (value) async => cubit.search(value),
                           ),
                           _VideosField(
-                            playlist: playlist,
-                            videos: videos,
+                            playlist: state.playlist,
+                            videos: state.videos ?? [],
                           ),
                         ],
                       ),
