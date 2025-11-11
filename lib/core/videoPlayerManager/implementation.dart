@@ -3,6 +3,8 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:nexor/nexor.dart';
 import 'package:quivor/core/models/entities/video.dart';
 import 'package:quivor/core/videoPlayerManager/interface.dart';
+import 'package:quivor/core/service/logger/logger_service.dart';
+import 'package:quivor/core/service/error/error_handler.dart';
 
 class VideoPlayerManager extends IVideoPlayerManager {
   late final Player _player = Player();
@@ -41,13 +43,16 @@ class VideoPlayerManager extends IVideoPlayerManager {
 
   @override
   FV open(List<VideoEntity> videos) async {
-    final playable = Playlist(videos.map((x) => Media(x.path)).toList());
-    await _player.open(playable);
-    _player.stream.track.listen(
-      (event) async {
-        await _openSubtitle();
-      },
-    );
+    try {
+      logger.info('Opening playlist with ${videos.length} videos');
+      final playable = Playlist(videos.map((x) => Media(x.path)).toList());
+      await _player.open(playable);
+      _player.setSubtitleTrack(SubtitleTrack.no());
+      logger.info('Playlist opened successfully');
+    } catch (e, stackTrace) {
+      errorHandler.handleError('VideoPlayerManager open', e, stackTrace);
+      rethrow;
+    }
   }
 
   @override
@@ -104,13 +109,80 @@ class VideoPlayerManager extends IVideoPlayerManager {
   @override
   Stream<bool> get isCompleted => _player.stream.completed;
 
-  FV _openSubtitle() async {
-    final x = _player.state.track.video.title;
-    final z = x?.lastIndexOf('.');
-    final y = x?.substring(0, z);
-    final res = '$y.srt';
-    try {
-      await _player.setSubtitleTrack(SubtitleTrack.data(res));
-    } catch (e) {}
+  @override
+  Stream<Duration> get state => _player.stream.duration;
+
+  @override
+  Stream<void> get tracksStream => _player.stream.tracks;
+
+  @override
+  List<Map<String, String>> get audioTracks {
+    final res = _player.state.tracks.audio.map((track) {
+      return {
+        'id': track.id,
+        'title': track.title ?? '',
+        'language': track.language ?? '',
+      };
+    }).toList();
+    return res;
   }
+
+  @override
+  List<Map<String, String>> get subtitleTracks {
+    final tracks = <Map<String, String>>[];
+    tracks.addAll(_player.state.tracks.subtitle.map((track) {
+      return {
+        'id': track.id,
+        'title': track.title ?? '',
+        'language': track.language ?? '',
+      };
+    }).toList());
+    return tracks;
+  }
+
+  @override
+  String get currentAudioTrack => _player.state.track.audio.id;
+
+  @override
+  String get currentSubtitleTrack => _player.state.track.subtitle.id;
+
+  @override
+  FV setAudioTrack(String trackId) async {
+    final track = _player.state.tracks.audio.firstWhere(
+      (t) => t.id == trackId,
+      orElse: () => _player.state.tracks.audio.first,
+    );
+    await _player.setAudioTrack(track);
+  }
+
+  @override
+  FV setSubtitleTrack(String trackId) async {
+    if (trackId == 'no') {
+      await _player.setSubtitleTrack(SubtitleTrack.no());
+    } else {
+      final track = _player.state.tracks.subtitle.firstWhere(
+        (t) => t.id == trackId,
+        orElse: () => SubtitleTrack.no(),
+      );
+      await _player.setSubtitleTrack(track);
+    }
+  }
+
+  @override
+  FV loadExternalSubtitle(String subtitlePath) async {
+    try {
+      logger.info('Loading external subtitle: $subtitlePath');
+      await _player.setSubtitleTrack(
+        SubtitleTrack.uri(subtitlePath),
+      );
+      logger.info('External subtitle loaded successfully');
+    } catch (e, stackTrace) {
+      errorHandler.handleError(
+          'VideoPlayerManager loadExternalSubtitle', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Duration get duration => _player.state.duration;
 }

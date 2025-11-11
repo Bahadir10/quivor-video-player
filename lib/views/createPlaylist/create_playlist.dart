@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:app_materials/app_materials.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:nexor/nexor.dart';
 import 'package:quivor/core/enum/route.dart';
@@ -22,6 +23,7 @@ import 'package:responsive_builder/responsive_builder.dart';
 import 'package:path/path.dart' as p;
 part 'viewModel/cubit/_cubit.dart';
 part 'viewModel/cubit/_state.dart';
+part 'create_playlist.freezed.dart';
 
 part 'widgets/_create_empty.dart';
 part 'widgets/_path_chose.dart';
@@ -41,7 +43,7 @@ class CreatePlaylistScreen extends StatelessWidget {
               )
             : null,
         appBar: AppBar(
-          leading: BlocBuilder<_ScreenCubit, _ScreenState>(
+          leading: BlocBuilder<_ScreenCubit, CreatePlaylistScreenState>(
             builder: (context, state) {
               return IconButton(
                   onPressed: () =>
@@ -50,7 +52,7 @@ class CreatePlaylistScreen extends StatelessWidget {
             },
           ),
         ),
-        body: BlocBuilder<_ScreenCubit, _ScreenState>(
+        body: BlocBuilder<_ScreenCubit, CreatePlaylistScreenState>(
           builder: (context, state) {
             final paths = state.playlistItems;
             Widget x = _WhenLandedView();

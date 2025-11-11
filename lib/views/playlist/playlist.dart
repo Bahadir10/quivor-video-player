@@ -4,6 +4,7 @@ import 'package:app_materials/app_materials.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:nexor/nexor.dart';
 import 'package:quivor/core/bloc/base_cubit.dart';
 import 'package:quivor/core/enum/route.dart';
@@ -15,14 +16,13 @@ import 'package:quivor/core/service/interface/video.dart';
 import 'package:quivor/core/service/responseModel/playlist_state.dart';
 import 'package:quivor/getit_settings.dart';
 import 'package:quivor/utils/helper.dart' show Helper;
-import 'package:quivor/utils/strings.dart';
 import 'package:quivor/views/play/play.dart';
-import 'package:quivor/widgets/check_box.dart';
 import 'package:quivor/widgets/side_bar.dart';
 import 'package:path/path.dart' as p;
 
 part 'viewModel/cubit/_cubit.dart';
 part 'viewModel/cubit/_state.dart';
+part 'playlist.freezed.dart';
 
 part 'widgets/_videos.dart';
 part 'widgets/_top_field.dart';
@@ -53,13 +53,15 @@ class PlaylistScreen extends StatelessWidget {
           create: (context) => _ScreenCubit(
             playlist: playlist,
           )..init(),
-          child: BlocBuilder<_ScreenCubit, _ScreenState>(
+          child: BlocBuilder<_ScreenCubit, PlaylistScreenState>(
             builder: (context, state) {
               if (state.isLoading) {
                 return const Center(
-                    child: CircularProgressIndicator(
-                  color: Colors.white,
-                ));
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                );
               }
 
               final videos = state.videos!;
@@ -67,25 +69,55 @@ class PlaylistScreen extends StatelessWidget {
               return Row(
                 children: [
                   if (state.isSideBarOpen) const SideBar(),
-                  if (state.isSideBarOpen) Spacers.small.horizontal,
                   Flexible(
                     child: Padding(
-                      padding: Paddings.medium.horizontal,
+                      padding: const EdgeInsets.all(24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Spacers.medium.vertical,
+                          // Top field with stats
                           _TopField(
                             percentage: state.playlist.progressPercentage,
                             playlist: state.playlist,
                             videos: videos,
                             watchedCount: state.playlist.watchedCount,
                           ),
-                          Spacers.small.vertical,
-                          CustomTextField(
-                            hintText: Strings.search(),
-                            onChanged: (value) async => cubit.search(value),
+
+                          const SizedBox(height: 24),
+
+                          // Search bar
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.black1.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.white1.withValues(alpha: 0.1),
+                              ),
+                            ),
+                            child: TextField(
+                              onChanged: (value) async => cubit.search(value),
+                              style: const TextStyle(color: AppColors.white1),
+                              decoration: InputDecoration(
+                                hintText: 'Video ara...',
+                                hintStyle: TextStyle(
+                                  color: AppColors.grey1.withValues(alpha: 0.6),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: AppColors.grey1.withValues(alpha: 0.6),
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                              ),
+                            ),
                           ),
+
+                          const SizedBox(height: 16),
+
+                          // Videos list
                           _VideosField(
                             playlist: state.playlist,
                             videos: state.videos ?? [],

@@ -1,24 +1,31 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:nexor/nexor.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:quivor/core/models/entities/category.dart';
-import 'package:quivor/core/models/entities/playlist.dart';
-import 'package:quivor/core/models/entities/recent.dart';
-import 'package:quivor/core/models/entities/video.dart';
+import 'package:path/path.dart' as p;
+import 'package:drift/native.dart';
+import 'package:quivor/core/service/drift/database.dart';
+import 'package:quivor/core/service/drift/migration.dart';
 import 'package:quivor/getit_settings.dart';
 
-late final Isar isar;
+late final AppDatabase database;
 
 final class AppInitialize {
   FV run() async {
     WidgetsFlutterBinding.ensureInitialized();
     MediaKit.ensureInitialized();
+
+    // Initialize Drift database
     final dir = await getApplicationDocumentsDirectory();
-    isar = await Isar.open(
-        [PlaylistSchema, CategorySchema, VideoEntitySchema, RecentSchema],
-        directory: dir.path, name: 'quivor');
+    final dbPath = p.join(dir.path, 'quivor.db');
+    database = AppDatabase(NativeDatabase.createInBackground(File(dbPath)));
+
+    // Run migration if needed
+    // final migration = IsarToDriftMigration(database);
+    // if (await migration.needsMigration()) {
+    //   await migration.migrate();
+    // }
 
     GetitSettings().init();
   }

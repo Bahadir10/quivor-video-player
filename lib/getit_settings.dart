@@ -8,12 +8,14 @@ import 'package:quivor/core/fileManager/interface.dart';
 
 import 'package:quivor/core/service/interface/playlist.dart';
 import 'package:quivor/core/service/interface/video.dart';
-import 'package:quivor/core/service/isar/playlist.dart';
-import 'package:quivor/core/service/isar/video.dart';
+import 'package:quivor/core/service/drift/playlist.dart';
+import 'package:quivor/core/service/drift/video.dart';
+import 'package:quivor/intialize.dart';
 import 'package:quivor/views/createPlaylist/create_playlist.dart';
 import 'package:quivor/views/home/home.dart';
 import 'package:quivor/views/play/play.dart';
 import 'package:quivor/views/playlist/playlist.dart';
+import 'package:quivor/views/settings/settings.dart';
 
 final getIt = GetIt.instance;
 
@@ -22,8 +24,8 @@ final class GetitSettings {
     getIt
 
       // SERVICE
-      ..registerSingleton<IPlaylistService>(IsarPlaylistService())
-      ..registerSingleton<IVideoService>(IsarVideoService())
+      ..registerSingleton<IPlaylistService>(DriftPlaylistService(database))
+      ..registerSingleton<IVideoService>(DriftVideoService(database))
       ..registerSingleton<IFileManager>(FileManager())
       // CUBITS
       ..registerSingleton<RecentVideosCubit>(RecentVideosCubit()..init())
@@ -40,6 +42,7 @@ final class GetitSettings {
           'playlist' => PlaylistScreen(
               params: data,
             ),
+          'settings' => SettingsScreen(),
           String() => Scaffold(),
         };
       }));

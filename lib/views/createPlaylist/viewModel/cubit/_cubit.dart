@@ -1,8 +1,8 @@
 part of '../../create_playlist.dart';
 
-final class _ScreenCubit extends Cubit<_ScreenState> {
+final class _ScreenCubit extends Cubit<CreatePlaylistScreenState> {
   final BuildContext context;
-  _ScreenCubit(this.context) : super(_ScreenState());
+  _ScreenCubit(this.context) : super(CreatePlaylistScreenState());
   String playlistName = '';
   List<String> _paths = [];
   TextEditingController playlistNameController = TextEditingController();

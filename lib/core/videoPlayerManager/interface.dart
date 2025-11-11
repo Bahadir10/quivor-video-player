@@ -18,13 +18,23 @@ abstract class IVideoPlayerManager {
   FV setShuffle(bool value);
   FV play();
   FV pause();
+  FV setAudioTrack(String trackId);
+  FV setSubtitleTrack(String trackId);
+  FV loadExternalSubtitle(String subtitlePath);
 
+  Duration get duration;
   Duration get position;
   dynamic get controller;
   bool get isPlaying;
   double get volume;
+  List<Map<String, String>> get audioTracks;
+  List<Map<String, String>> get subtitleTracks;
+  String get currentAudioTrack;
+  String get currentSubtitleTrack;
 
   Stream<bool> get isCompleted;
+  Stream<Duration> get state;
+  Stream<void> get tracksStream;
 
   final double playSpeedVerySlow = 0.25;
   final double playSpeedSlow = 0.50;

@@ -8,13 +8,31 @@ import 'package:nexor/nexor.dart';
 import 'package:quivor/core/bloc/cubits/recent_video.dart';
 
 import 'package:quivor/core/enum/standarts.dart';
+import 'package:quivor/core/service/error/error_handler.dart';
+import 'package:quivor/core/service/logger/logger_service.dart';
+import 'package:quivor/core/service/env/env_config_service.dart';
 import 'package:quivor/getit_settings.dart';
 import 'package:quivor/intialize.dart';
 
 import 'package:quivor/views/home/home.dart';
 
 Future<void> main() async {
+  // Initialize logger
+  logger.init();
+  logger.info('🚀 Application starting...');
+
+  // Initialize error handler
+  errorHandler.init();
+  logger.info('✅ Error handler initialized');
+
+  // Initialize environment configuration
+  await envConfig.initialize();
+  logger.info('✅ Environment configuration loaded');
+
+  // Initialize app
   await AppInitialize().run();
+  logger.info('✅ App initialization completed');
+
   runApp(const Quivor());
 }
 
@@ -33,18 +51,68 @@ class Quivor extends StatelessWidget {
       create: (BuildContext context) => getIt<RecentVideosCubit>(),
       child: MaterialApp(
         theme: ThemeData(
-            pageTransitionsTheme: PageTransitionsTheme(
-              builders:
-                  Map<TargetPlatform, PageTransitionsBuilder>.fromIterable(
-                TargetPlatform.values,
-                value: (_) => const FadeUpwardsPageTransitionsBuilder(),
-              ),
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: AppColors.black2,
+
+          // AppBar theme
+          appBarTheme: const AppBarTheme(
+            backgroundColor: AppColors.white1,
+            foregroundColor: AppColors.black1,
+          ),
+
+          // Dialog theme
+          dialogTheme: DialogTheme(
+            backgroundColor: AppColors.black2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            extensions: [NexorSpacerThemeExtension(standarts: standarts)],
-            scaffoldBackgroundColor: AppColors.black2,
-            appBarTheme: const AppBarTheme(
-                backgroundColor: AppColors.white1,
-                foregroundColor: AppColors.black1)),
+          ),
+
+          // Slider theme
+          sliderTheme: SliderThemeData(
+            activeTrackColor: AppColors.white1,
+            inactiveTrackColor: AppColors.grey1.withValues(alpha: 0.3),
+            thumbColor: AppColors.white1,
+            overlayColor: AppColors.white1.withValues(alpha: 0.2),
+            valueIndicatorColor: AppColors.white1,
+            valueIndicatorTextStyle: const TextStyle(
+              color: AppColors.black1,
+            ),
+          ),
+
+          // Radio button theme
+          radioTheme: RadioThemeData(
+            fillColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return AppColors.white1;
+              }
+              return AppColors.grey1;
+            }),
+          ),
+
+          // Icon theme
+          iconTheme: const IconThemeData(
+            color: AppColors.white1,
+          ),
+
+          // Text theme
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: AppColors.white1),
+            bodyMedium: TextStyle(color: AppColors.white1),
+            bodySmall: TextStyle(color: AppColors.grey1),
+          ),
+
+          // Page transitions
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: Map<TargetPlatform, PageTransitionsBuilder>.fromIterable(
+              TargetPlatform.values,
+              value: (_) => const FadeUpwardsPageTransitionsBuilder(),
+            ),
+          ),
+
+          // Extensions
+          extensions: [NexorSpacerThemeExtension(standarts: standarts)],
+        ),
         home: const HomeScreen(),
       ),
     );

@@ -1,11 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:isar/isar.dart';
 
-part 'video.g.dart';
-
-@collection
 final class VideoEntity {
-  final Id id;
+  final int id;
   final String name;
   final String path;
   final bool isWatched;
@@ -15,7 +11,7 @@ final class VideoEntity {
 
   final int lastPositionSecond;
   const VideoEntity({
-    this.id = Isar.autoIncrement,
+    this.id = 0,
     required this.name,
     required this.path,
     this.isWatched = false,

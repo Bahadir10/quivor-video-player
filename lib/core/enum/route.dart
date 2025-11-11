@@ -2,5 +2,6 @@ enum AppRoute {
   home,
   createPlaylist,
   player,
-  playlist;
+  playlist,
+  settings;
 }

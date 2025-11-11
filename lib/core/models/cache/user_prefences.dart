@@ -1,17 +1,13 @@
-import 'package:flutter/widgets.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:quivor/core/enum/auto_play_mode.dart';
 
-@immutable
-final class UserPrefrences {
-  final double volume;
-  const UserPrefrences({
-    required this.volume,
-  });
+part 'user_prefences.freezed.dart';
 
-  UserPrefrences copyWith({
-    double? volume,
-  }) {
-    return UserPrefrences(
-      volume: volume ?? this.volume,
-    );
-  }
+@freezed
+class UserPrefrences with _$UserPrefrences {
+  factory UserPrefrences({
+    required double volume,
+    @Default(AutoPlayMode.early) AutoPlayMode autoPlayMode,
+    @Default(15) int earlyTransitionSeconds,
+  }) = _UserPrefrences;
 }

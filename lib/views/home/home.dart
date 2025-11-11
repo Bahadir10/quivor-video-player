@@ -1,6 +1,7 @@
 import 'package:app_materials/app_materials.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:nexor/nexor.dart';
 
@@ -28,6 +29,7 @@ import 'package:path/path.dart' as p;
 
 part 'widgets/_playlist.dart';
 part 'widgets/_recent_videos.dart';
+part 'home.freezed.dart';
 part 'widgets/_middle_area.dart';
 
 part 'viewModel/cubit/_cubit.dart';
@@ -49,7 +51,7 @@ class HomeScreen extends StatelessWidget {
               );
             },
           ),
-          body: BlocBuilder<_ScreenCubit, _ScreenState>(
+          body: BlocBuilder<_ScreenCubit, HomeScreenState>(
             builder: (context, state) {
               if (state.isLoading) {
                 return _whenLoading();

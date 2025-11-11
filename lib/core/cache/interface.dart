@@ -7,6 +7,8 @@ abstract class ICacheManager {
 
   Future<UserPrefrences> getUserPrefrences();
   FV setUserVolumeSelection(double volume);
+  FV setAutoPlayMode(String mode);
+  FV setEarlyTransitionSeconds(int seconds);
 
   factory ICacheManager.scoped() => CacheManager();
 }

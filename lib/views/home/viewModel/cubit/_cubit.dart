@@ -1,8 +1,8 @@
 part of '../../home.dart';
 
-final class _ScreenCubit extends BaseCubit<_ScreenState> {
+final class _ScreenCubit extends BaseCubit<HomeScreenState> {
   final BuildContext context;
-  _ScreenCubit(this.context) : super(const _ScreenState());
+  _ScreenCubit(this.context) : super(HomeScreenState());
 
   List<PlaylistStateResponseModel> playlists = [];
 
@@ -58,5 +58,24 @@ final class _ScreenCubit extends BaseCubit<_ScreenState> {
     await getIt<IPlaylistService>().removePlaylist(id);
     playlists.removeWhere((e) => e.id == id);
     safeEmit(state.copyWith(playlists: playlists));
+  }
+
+  FV playPlaylist(PlaylistStateResponseModel playlist) async {
+    // Get all videos for this playlist
+    final videos = await getIt<IVideoService>().playlistVideos(playlist.id);
+
+    if (videos.isEmpty) return;
+
+    // Find first unwatched video or start from beginning
+    final startIndex = videos.indexWhere((v) => !v.isWatched);
+
+    context.go(
+      AppRoute.player,
+      data: PlayScreenParameters(
+        paths: videos,
+        mainPath: playlist.name,
+        startIndex: startIndex >= 0 ? startIndex : 0,
+      ),
+    );
   }
 }

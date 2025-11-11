@@ -33,6 +33,10 @@ class FileManager extends IFileManager {
             if (entity.path.endsWith('.mp4')) {
               playlists.add(entity.path);
             }
+
+            if (entity.path.endsWith('.mkv')) {
+              playlists.add(entity.path);
+            }
           }
         }
       }

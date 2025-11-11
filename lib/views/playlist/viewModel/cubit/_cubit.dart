@@ -1,9 +1,9 @@
 part of '../../playlist.dart';
 
-final class _ScreenCubit extends BaseCubit<_ScreenState> {
+final class _ScreenCubit extends BaseCubit<PlaylistScreenState> {
   final PlaylistStateResponseModel playlist;
   _ScreenCubit({required this.playlist})
-      : super(_ScreenState(
+      : super(PlaylistScreenState(
           playlist: playlist,
         ));
   late final List<VideoEntity> videos;

@@ -1,132 +1,156 @@
 part of '../create_playlist.dart';
 
 class _WhenLandedView extends StatelessWidget {
-  const _WhenLandedView({super.key});
+  const _WhenLandedView();
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.cubit<_ScreenCubit>();
-    final itemFromFolder = _selectionItem(Strings.fromFolder(),
-        AppIcons.folderOpen, Strings.selectFolder(), true, context);
-    final emptyList = _selectionItem(Strings.empty(), AppIcons.playlistAdd,
-        Strings.createNew(), false, context);
-    return ScreenTypeLayout.builder(
-      desktop: (context) {
-        return Column(
+
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 900),
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Spacer(),
+            // Header
+            Text(
+              'Playlist Oluştur',
+              style: AppTypography.headingLarge.copyWith(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Nasıl bir playlist oluşturmak istersiniz?',
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.grey1,
+              ),
+            ),
+
+            const SizedBox(height: 48),
+
+            // Options
             Row(
               children: [
-                const Spacer(flex: 1),
                 Expanded(
-                  flex: 2,
-                  child: itemFromFolder,
+                  child: _SelectionCard(
+                    icon: Icons.folder_open_rounded,
+                    title: 'Klasörden',
+                    description: 'Bir klasördeki tüm videoları ekle',
+                    buttonText: 'Klasör Seç',
+                    onPressed: () async => await cubit.openPath(),
+                  ),
                 ),
-                Spacers.high.horizontal,
+                const SizedBox(width: 24),
                 Expanded(
-                  flex: 2,
-                  child: emptyList,
+                  child: _SelectionCard(
+                    icon: Icons.playlist_add_rounded,
+                    title: 'Boş Playlist',
+                    description: 'Yeni bir boş playlist oluştur',
+                    buttonText: 'Oluştur',
+                    onPressed: () => cubit.makeChoise(),
+                  ),
                 ),
-                const Spacer(flex: 1)
               ],
             ),
-            const Spacer(),
           ],
-        );
-      },
-      mobile: (context) {
-        return Center(
-          child: Padding(
-            padding: Paddings.medium.all,
-            child: Container(
-              height: 240,
-              decoration: BoxDecoration(
-                  color: AppColors.black3, borderRadius: Cutter.medium.all),
-              child: Padding(
-                padding: Paddings.medium.all,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _mobileSelectionItem(
-                      Strings.fromFolder(),
-                      AppIcons.folderOpen,
-                      Strings.selectFolder(),
-                      onPressed: () async => await cubit.openPath(),
-                    ),
-                    Container(
-                      height: 220,
-                      width: 1,
-                      decoration: BoxDecoration(
-                          color: AppColors.grey3,
-                          borderRadius: Cutter.medium.all),
-                    ),
-                    _mobileSelectionItem(
-                      Strings.empty(),
-                      AppIcons.playlistAdd,
-                      Strings.createNew(),
-                      onPressed: () => cubit.makeChoise(),
-                    )
-                  ],
-                ),
-              ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SelectionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String description;
+  final String buttonText;
+  final VoidCallback onPressed;
+
+  const _SelectionCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.buttonText,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF2A2A2A),
+            Color(0xFF1A1A1A),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.white1.withValues(alpha: 0.1),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.white1.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 48,
+              color: AppColors.white1,
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _mobileSelectionItem(String text, Icon icon, String buttonText,
-      {void Function()? onPressed}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        icon,
-        Spacers.small.vertical,
-        Text(
-          text,
-          style: AppTypography.headingSmall,
-        ),
-        Spacers.medium.vertical,
-        CustomFilledButton(
-          onPressed: onPressed,
-          text: buttonText,
-        ),
-      ],
-    );
-  }
-
-  Widget _selectionItem(String text, Icon icon, String buttonText,
-      bool openFolder, BuildContext context) {
-    return Container(
-        height: 240,
-        decoration: BoxDecoration(
-            color: AppColors.black3, borderRadius: Cutter.medium.all),
-        child: Padding(
-          padding: Paddings.high.horizontal,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              icon,
-              Spacers.small.vertical,
-              Text(
-                text,
-                style: AppTypography.headingSmall,
-              ),
-              Spacers.medium.vertical,
-              CustomFilledButton(
-                onPressed: () async {
-                  if (openFolder) {
-                    await context.cubit<_ScreenCubit>().openPath();
-                  } else {
-                    context.cubit<_ScreenCubit>().makeChoise();
-                  }
-                },
-                text: buttonText,
-              ),
-            ],
+          const SizedBox(height: 24),
+          Text(
+            title,
+            style: AppTypography.headingMedium.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ));
+          const SizedBox(height: 12),
+          Text(
+            description,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.grey1,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.white1,
+                foregroundColor: AppColors.black1,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(buttonText),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

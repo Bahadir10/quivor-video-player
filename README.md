@@ -1,67 +1,139 @@
-# Quivor
+# Quivor - Modern Video Player
 
-![Quivor1](https://github.com/user-attachments/assets/549b34ed-acff-47bb-a12b-9471822b14c9)
+A feature-rich, modern video player built with Flutter, designed for an enhanced series watching experience.
 
-**Quivor** is a Flutter-based app designed to turn local video files into playlists while tracking your progress. Whether you're watching tutorials, movies, or personal videos, Quivor allows you to pick up right where you left off with ease.
+## ✨ Features
 
-## Features
+### 🎬 Smart Auto-Play System
+- **Early Transition Mode**: "Next Episode" button appears 15 seconds before episode ends
+- **Auto Mode**: Automatically plays next episode when current one finishes
+- **Manual Mode**: Traditional manual control
+- User preferences cached for seamless experience
 
-- Organize local videos into playlists
-- Tracks your progress for each video
-- Resume playback from where you left off
-- Simple, intuitive interface
+### 🌐 OpenSubtitles Integration
+- One-click subtitle search and download
+- Automatic subtitle matching via file hash
+- Multiple language support
+- Secure API token management
+- Settings UI for easy configuration
 
-## Screenshots
+### 🎨 Modern UI/UX
+- Beautiful gradient backgrounds
+- Modern card-based design
+- Smooth animations and transitions
+- Dark theme optimized
+- Responsive layout (desktop & mobile)
 
-![ss1](https://github.com/user-attachments/assets/d71f7b1e-cbfa-4cc9-b925-a8d138b8ad4e)
-![WhatsApp Image 2024-10-12 at 19 37 48_8e54cd49](https://github.com/user-attachments/assets/8f62567f-125b-4aa5-92d6-3e6851d651b4)
-![ss3](https://github.com/user-attachments/assets/8ad22599-396b-4047-87a5-df83c4f05f14)
+### 📊 Playlist Management
+- Auto-create playlists from folders
+- Watch history tracking
+- "Continue Watching" feature
+- Progress tracking for each video
+- Easy playlist navigation
 
+### 🔧 Technical Features
+- Cross-platform (Windows, macOS, Linux, Android, iOS)
+- Comprehensive logging system
+- Error handling with user-friendly messages
+- Secure credential storage
+- Environment-based configuration
 
+## 🚀 Getting Started
 
 ### Prerequisites
+- Flutter SDK (>=3.4.1)
+- Dart SDK
+- OpenSubtitles API key (optional, for subtitle features)
 
-Before you begin, ensure you have the following installed:
+### Installation
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install)
-- Android Studio or VSCode with Flutter support
-- A device or emulator for testing
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/quivor.git
+cd quivor
+```
 
-### Steps to Install
+2. Install dependencies
+```bash
+flutter pub get
+```
 
-1. Clone the repository:
+3. Run build runner (for generated code)
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
 
-   ```bash
-   git clone https:/Bahadir10/yourusername/quivor.git
-   
-2. Navigate into the project directory:
+4. Create `.env` file (optional, for OpenSubtitles)
+```bash
+cp .env.example .env
+# Edit .env and add your OpenSubtitles API key
+```
 
-   ```bash
-   cd quivor-video-player
-   
-3. Fetch the necessary dependencies:
-   ```bash
-   flutter pub get
+5. Run the app
+```bash
+flutter run
+```
 
-4. Run the app:
-    ```bash
-   flutter run
+## 🔑 OpenSubtitles Setup
 
-### Usage
-  - Add local video files from your device.
-  - Create custom playlists to organize your videos.
-  - Watch videos and Quivor will automatically save your progress.
-  - Come back to any video and continue from where you left off!
+1. Get your API key from [OpenSubtitles.com](https://www.opensubtitles.com/en/consumers)
+2. Add it to `.env` file or configure through Settings UI
+3. Login through the app or manually enter your authentication token
 
-### Contributing
-  Contributions are welcome! If you'd like to contribute to Quivor, please follow these steps:
+## 🏗️ Architecture
 
-#### Fork the repository
-  1. Create a new branch (git checkout -b feature-branch)
-  2. Make your changes and commit (git commit -m 'Add new feature')
-  3. Push to the branch (git push origin feature-branch)
-  4. Submit a pull request
+- **State Management**: BLoC pattern with Freezed
+- **Database**: Drift (SQLite)
+- **Dependency Injection**: GetIt
+- **Code Generation**: Freezed, Drift, Build Runner
+- **Video Player**: media_kit
+- **Secure Storage**: flutter_secure_storage
 
-### Contact 
-  For any questions or feedback, feel free to reach out at [bahadircodes@gmail.com].
+## 📦 Key Dependencies
+
+```yaml
+dependencies:
+  flutter_bloc: ^9.1.0
+  freezed_annotation: ^2.4.1
+  drift: 2.14.1
+  media_kit: ^1.1.11
+  flutter_secure_storage: ^9.2.2
+  flutter_dotenv: ^5.1.0
+  get_it: ^8.0.0
   
+dev_dependencies:
+  freezed: ^2.4.5
+  build_runner: ^2.4.11
+  drift_dev: 2.14.1
+```
+
+## 🎯 Roadmap
+
+- [ ] Android & iOS support
+- [ ] Subtitle synchronization controls
+- [ ] Multiple audio track support
+- [ ] Chromecast support
+- [ ] Cloud sync for watch history
+- [ ] Keyboard shortcuts customization
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- [OpenSubtitles](https://www.opensubtitles.com/) for subtitle API
+- [media_kit](https://pub.dev/packages/media_kit) for video playback
+- Flutter community for amazing packages
+
+## 📧 Contact
+
+For questions or feedback, please open an issue on GitHub.
+
+---
+
+Made with ❤️ using Flutter

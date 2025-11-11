@@ -1,12 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:app_materials/app_materials.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nexor/nexor.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:quivor/core/bloc/base_cubit.dart';
 import 'package:quivor/core/bloc/cubits/recent_video.dart';
@@ -16,19 +18,29 @@ import 'package:quivor/core/extensions/build_context.dart';
 import 'package:quivor/core/models/entities/video.dart';
 import 'package:quivor/core/service/interface/video.dart';
 import 'package:quivor/core/videoPlayerManager/interface.dart';
+import 'package:quivor/core/service/opensubtitles/interface.dart';
+import 'package:quivor/core/service/opensubtitles/models.dart';
+import 'package:quivor/core/enum/auto_play_mode.dart';
+import 'package:quivor/core/service/logger/logger_service.dart';
+import 'package:quivor/core/service/error/error_handler.dart';
 import 'package:quivor/getit_settings.dart';
 import 'package:quivor/utils/strings.dart';
-import 'package:quivor/widgets/check_box.dart';
 import 'package:quivor/widgets/dropdown.dart';
 import 'package:quivor/widgets/side_bar.dart';
 import 'package:quivor/widgets/slider.dart';
 import 'package:quivor/widgets/video_player.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 part 'viewModel/cubit/_cubit.dart';
 part 'viewModel/cubit/_state.dart';
+part 'play.freezed.dart';
 
 part 'widgets/_bottom_field.dart';
 part 'widgets/_end_field.dart';
+part 'widgets/_subtitle_search_dialog.dart';
+part 'widgets/_next_episode_button.dart';
+part 'widgets/_auto_play_settings.dart';
 
 final class PlayScreenParameters {
   final List<VideoEntity> paths;
@@ -71,7 +83,7 @@ class _PlayScreenState extends State<PlayScreen> {
                   child: SideBar(),
                 )
               : null,
-          endDrawer: BlocBuilder<_ScreenCubit, _ScreenState>(
+          endDrawer: BlocBuilder<_ScreenCubit, PlayScreenState>(
             builder: (context, state) {
               return _EndField(
                 videos: state.videos,
@@ -81,11 +93,11 @@ class _PlayScreenState extends State<PlayScreen> {
             },
           ),
           appBar: AppBar(
-            leading: BlocBuilder<_ScreenCubit, _ScreenState>(
+            leading: BlocBuilder<_ScreenCubit, PlayScreenState>(
               builder: (context, state) {
                 return IconButton(
                   padding: EdgeInsets.zero,
-                  icon: AppIcons.menu.copyWith(color: AppColors.black2),
+                  icon: const Icon(Icons.menu, color: AppColors.black2),
                   onPressed: () =>
                       context.cubit<_ScreenCubit>().toggleSideBar(context),
                 );
@@ -93,35 +105,101 @@ class _PlayScreenState extends State<PlayScreen> {
             ),
             backgroundColor: AppColors.white1,
             automaticallyImplyLeading: false,
-            title: BlocBuilder<_ScreenCubit, _ScreenState>(
+            elevation: 0,
+            title: BlocBuilder<_ScreenCubit, PlayScreenState>(
               builder: (context, state) {
-                return Text(state.currentPlaying?.name ?? '');
+                return Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.black1.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.play_circle_filled,
+                        color: AppColors.black1,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        state.currentPlaying?.name ?? '',
+                        style: const TextStyle(
+                          color: AppColors.black1,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                );
               },
             ),
           ),
-          body: BlocBuilder<_ScreenCubit, _ScreenState>(
+          body: BlocBuilder<_ScreenCubit, PlayScreenState>(
             builder: (context, state) {
-              return Row(
-                children: [
-                  if (state.isSideBarOpen) SideBar(),
-                  Column(
-                    children: [
-                      SizedBox(
-                        width: state.isSideBarOpen
-                            ? context.col(10)
-                            : context.width,
-                        height: context.height * 0.7,
-                        child: AppVideoPlayer(
-                          videoPlayerManager: _playerManager,
-                        ),
+              return Container(
+                color: AppColors.black1,
+                child: Row(
+                  children: [
+                    if (state.isSideBarOpen) const SideBar(),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              color: Colors.black,
+                              child: Stack(
+                                children: [
+                                  Center(
+                                    child: AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: AppVideoPlayer(
+                                        videoPlayerManager: _playerManager,
+                                      ),
+                                    ),
+                                  ),
+                                  // Next episode button (only in early mode)
+                                  if (state.showNextEpisode &&
+                                      state.autoPlayMode == AutoPlayMode.early)
+                                    _NextEpisodeButton(
+                                      onNext: () async => await context
+                                          .cubit<_ScreenCubit>()
+                                          .playNext(),
+                                      onCancel: () => context
+                                          .cubit<_ScreenCubit>()
+                                          .hideNextEpisode(),
+                                      secondsRemaining: 10,
+                                      autoPlayEnabled: true,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.black2,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, -2),
+                                ),
+                              ],
+                            ),
+                            child: _BottomField(
+                              playerManager: _playerManager,
+                              state: state,
+                            ),
+                          ),
+                        ],
                       ),
-                      _BottomField(
-                        playerManager: _playerManager,
-                        state: state,
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               );
             },
           )),
