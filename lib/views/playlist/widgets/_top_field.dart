@@ -106,7 +106,7 @@ class _TopField extends StatelessWidget {
               Expanded(
                 child: _StatCard(
                   icon: Icons.video_library,
-                  label: 'Toplam',
+                  label: 'Total',
                   value: '${videos.length}',
                   color: AppColors.white1,
                 ),

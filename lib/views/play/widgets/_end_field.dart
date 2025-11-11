@@ -118,7 +118,7 @@ class _EndField extends StatelessWidget {
                 children: [
                   _StatBadge(
                     icon: Icons.video_library,
-                    label: 'Toplam',
+                    label: 'Total',
                     value: '${videos.length}',
                   ),
                   const SizedBox(width: 12),

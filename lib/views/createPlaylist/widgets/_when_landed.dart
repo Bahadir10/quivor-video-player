@@ -16,7 +16,7 @@ class _WhenLandedView extends StatelessWidget {
           children: [
             // Header
             Text(
-              'Playlist Oluştur',
+              'Create Playlist',
               style: AppTypography.headingLarge.copyWith(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -24,7 +24,7 @@ class _WhenLandedView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Nasıl bir playlist oluşturmak istersiniz?',
+              'How would you like to create your playlist?',
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.grey1,
               ),
@@ -38,9 +38,9 @@ class _WhenLandedView extends StatelessWidget {
                 Expanded(
                   child: _SelectionCard(
                     icon: Icons.folder_open_rounded,
-                    title: 'Klasörden',
-                    description: 'Bir klasördeki tüm videoları ekle',
-                    buttonText: 'Klasör Seç',
+                    title: 'From Folder',
+                    description: 'Add all videos from a folder',
+                    buttonText: 'Select Folder',
                     onPressed: () async => await cubit.openPath(),
                   ),
                 ),
@@ -48,9 +48,9 @@ class _WhenLandedView extends StatelessWidget {
                 Expanded(
                   child: _SelectionCard(
                     icon: Icons.playlist_add_rounded,
-                    title: 'Boş Playlist',
-                    description: 'Yeni bir boş playlist oluştur',
-                    buttonText: 'Oluştur',
+                    title: 'Empty Playlist',
+                    description: 'Create a new empty playlist',
+                    buttonText: 'Create',
                     onPressed: () => cubit.makeChoise(),
                   ),
                 ),

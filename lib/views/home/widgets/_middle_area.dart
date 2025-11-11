@@ -142,7 +142,7 @@ class _MiddleArea extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                'Son İzlenenler',
+                'Recently Watched',
                 style: AppTypography.headingMedium.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

@@ -230,7 +230,7 @@ class _BottomFieldState extends State<_BottomField> {
               ),
               IconButton(
                 icon: const Icon(Icons.auto_awesome),
-                tooltip: 'Otomatik Oynatma Ayarları',
+                tooltip: 'Auto-Play Settings',
                 onPressed: () {
                   final cubit = context.read<_ScreenCubit>();
                   showDialog(

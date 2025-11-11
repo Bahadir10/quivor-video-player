@@ -54,7 +54,7 @@ class _PathChose extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Playlist Oluştur',
+                            'Create Playlist',
                             style: AppTypography.headingMedium.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -204,7 +204,7 @@ class _PathChose extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: () async => await cubit.createPlaylistFromPath(),
               icon: const Icon(Icons.check),
-              label: const Text('Playlist Oluştur'),
+              label: const Text('Create Playlist'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.white1,
                 foregroundColor: AppColors.black1,

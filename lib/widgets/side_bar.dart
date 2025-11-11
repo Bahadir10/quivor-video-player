@@ -87,19 +87,19 @@ class SideBar extends StatelessWidget {
             // Navigation buttons
             _NavButton(
               icon: Icons.home_rounded,
-              text: 'Ana Sayfa',
+              text: 'Home',
               onPressed: () => navigate(context, AppRoute.home),
             ),
             const SizedBox(height: 8),
             _NavButton(
               icon: Icons.playlist_add_rounded,
-              text: 'Playlist Oluştur',
+              text: 'Create Playlist',
               onPressed: () => navigate(context, AppRoute.createPlaylist),
             ),
             const SizedBox(height: 8),
             _NavButton(
               icon: Icons.settings_rounded,
-              text: 'Ayarlar',
+              text: 'Settings',
               onPressed: () => navigate(context, AppRoute.settings),
             ),
 
@@ -154,7 +154,7 @@ class SideBar extends StatelessWidget {
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'Video Aç',
+                        'Open Video',
                         style: TextStyle(
                           color: AppColors.white1,
                           fontSize: 16,
@@ -167,7 +167,7 @@ class SideBar extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'Bilgisayarınızdan video seçin',
+                        'Select video from your computer',
                         style: TextStyle(
                           color: AppColors.grey1.withValues(alpha: 0.8),
                           fontSize: 12,
@@ -198,7 +198,7 @@ class SideBar extends StatelessWidget {
                             }
                           },
                           icon: const Icon(Icons.folder_open, size: 18),
-                          label: const Text('Dosya Seç'),
+                          label: const Text('Select File'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.white1,
                             foregroundColor: AppColors.black1,
