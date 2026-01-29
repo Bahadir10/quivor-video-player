@@ -9,5 +9,6 @@ class UserPrefrences with _$UserPrefrences {
     required double volume,
     @Default(AutoPlayMode.early) AutoPlayMode autoPlayMode,
     @Default(15) int earlyTransitionSeconds,
+    @Default(10) int seekDurationSeconds,
   }) = _UserPrefrences;
 }

@@ -10,6 +10,16 @@ final class VideoEntity {
   final int? playlistId;
 
   final int lastPositionSecond;
+
+  /// List of downloaded subtitle file paths for this video
+  final List<String> downloadedSubtitles;
+
+  /// Last selected subtitle path (null if no subtitle or disabled)
+  final String? lastSelectedSubtitle;
+
+  /// Subtitle synchronization offset in seconds (can be negative)
+  final double subtitleOffset;
+
   const VideoEntity({
     this.id = 0,
     required this.name,
@@ -18,6 +28,9 @@ final class VideoEntity {
     this.categoryId,
     this.playlistId,
     this.lastPositionSecond = 0,
+    this.downloadedSubtitles = const [],
+    this.lastSelectedSubtitle,
+    this.subtitleOffset = 0.0,
   }); // : this.id = id ?? Isar.autoIncrement;
 
   VideoEntity copyWith({
@@ -28,6 +41,9 @@ final class VideoEntity {
     int? categoryId,
     int? playlistId,
     int? lastPositionSecond,
+    List<String>? downloadedSubtitles,
+    String? lastSelectedSubtitle,
+    double? subtitleOffset,
   }) {
     return VideoEntity(
       id: id ?? this.id,
@@ -37,11 +53,14 @@ final class VideoEntity {
       categoryId: categoryId ?? this.categoryId,
       playlistId: playlistId ?? this.playlistId,
       lastPositionSecond: lastPositionSecond ?? this.lastPositionSecond,
+      downloadedSubtitles: downloadedSubtitles ?? this.downloadedSubtitles,
+      lastSelectedSubtitle: lastSelectedSubtitle ?? this.lastSelectedSubtitle,
+      subtitleOffset: subtitleOffset ?? this.subtitleOffset,
     );
   }
 
   @override
   String toString() {
-    return 'VideoEntity(name: $name, path: $path, isWatched: $isWatched, categoryId: $categoryId, playlistId: $playlistId, lastPositionSecond: $lastPositionSecond)';
+    return 'VideoEntity(name: $name, path: $path, isWatched: $isWatched, categoryId: $categoryId, playlistId: $playlistId, lastPositionSecond: $lastPositionSecond, downloadedSubtitles: $downloadedSubtitles, lastSelectedSubtitle: $lastSelectedSubtitle, subtitleOffset: $subtitleOffset)';
   }
 }

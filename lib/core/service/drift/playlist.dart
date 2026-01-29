@@ -98,6 +98,22 @@ class DriftPlaylistService extends IPlaylistService {
     return entities.Playlist(
       id: playlist.id,
       name: playlist.name,
+      autoPlayMode: playlist.autoPlayMode,
+      earlyTransitionSeconds: playlist.earlyTransitionSeconds,
+      introSkipSeconds: playlist.introSkipSeconds,
     );
+  }
+
+  @override
+  Future<void> updatePlaylist(entities.Playlist playlist) async {
+    await _db.update(_db.playlists).replace(
+          PlaylistsCompanion(
+            id: Value(playlist.id),
+            name: Value(playlist.name),
+            autoPlayMode: Value(playlist.autoPlayMode),
+            earlyTransitionSeconds: Value(playlist.earlyTransitionSeconds),
+            introSkipSeconds: Value(playlist.introSkipSeconds),
+          ),
+        );
   }
 }

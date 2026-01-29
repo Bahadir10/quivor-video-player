@@ -8,12 +8,17 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:nexor/nexor.dart';
 import 'package:quivor/core/bloc/base_cubit.dart';
 import 'package:quivor/core/enum/route.dart';
+import 'package:quivor/core/enum/auto_play_mode.dart';
 import 'package:quivor/core/extensions/build_context.dart';
 import 'package:quivor/core/fileManager/interface.dart';
-
+import 'package:quivor/core/models/entities/playlist.dart' as entities;
 import 'package:quivor/core/models/entities/video.dart';
 import 'package:quivor/core/service/interface/video.dart';
+import 'package:quivor/core/service/interface/playlist.dart';
 import 'package:quivor/core/service/responseModel/playlist_state.dart';
+import 'package:quivor/core/data/user_data_manager.dart';
+import 'package:quivor/core/localization/localization_service.dart';
+import 'package:quivor/core/localization/locale_keys.dart';
 import 'package:quivor/getit_settings.dart';
 import 'package:quivor/utils/helper.dart' show Helper;
 import 'package:quivor/views/play/play.dart';

@@ -3,7 +3,7 @@ description: "Modern video player with playlist management and subtitle support.
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.0+3
+version: 1.4.0+7
 
 environment:
   sdk: ">=3.4.1 <4.0.0"
@@ -33,6 +33,7 @@ dependencies:
   responsive_builder: ^0.7.1
   google_fonts: ^6.2.1
   file_picker: ^9.2.1
+  easy_localization: ^3.0.7
 
   cupertino_icons: ^1.0.6
 
@@ -98,6 +99,6 @@ flutter:
     #- assets/svg/
     #- assets/json/
     - assets/images/
-    #- assets/translations/
+    - assets/translations/
     - assets/fonts/
     - .env

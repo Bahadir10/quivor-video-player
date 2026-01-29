@@ -2,6 +2,7 @@ import 'package:app_materials/app_materials.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:nexor/nexor.dart';
 
@@ -11,12 +12,17 @@ import 'package:quivor/core/enum/standarts.dart';
 import 'package:quivor/core/service/error/error_handler.dart';
 import 'package:quivor/core/service/logger/logger_service.dart';
 import 'package:quivor/core/service/env/env_config_service.dart';
+import 'package:quivor/core/localization/localization_service.dart';
+import 'package:quivor/core/localization/easy_localization_impl.dart';
 import 'package:quivor/getit_settings.dart';
 import 'package:quivor/intialize.dart';
 
 import 'package:quivor/views/home/home.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
   // Initialize logger
   logger.init();
   logger.info('🚀 Application starting...');
@@ -33,7 +39,18 @@ Future<void> main() async {
   await AppInitialize().run();
   logger.info('✅ App initialization completed');
 
-  runApp(const Quivor());
+  // Initialize localization service
+  initLocalizationService(EasyLocalizationService());
+  logger.info('✅ Localization service initialized');
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('tr')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      child: const Quivor(),
+    ),
+  );
 }
 
 class Quivor extends StatelessWidget {
@@ -50,6 +67,9 @@ class Quivor extends StatelessWidget {
     return BlocProvider(
       create: (BuildContext context) => getIt<RecentVideosCubit>(),
       child: MaterialApp(
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
         theme: ThemeData(
           brightness: Brightness.dark,
           scaffoldBackgroundColor: AppColors.black2,
@@ -61,7 +81,7 @@ class Quivor extends StatelessWidget {
           ),
 
           // Dialog theme
-          dialogTheme: DialogTheme(
+          dialogTheme: DialogThemeData(
             backgroundColor: AppColors.black2,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),

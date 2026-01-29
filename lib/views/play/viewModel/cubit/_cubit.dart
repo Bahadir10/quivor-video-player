@@ -1,21 +1,29 @@
 part of '../../play.dart';
 
 final class _ScreenCubit extends BaseCubit<PlayScreenState> {
-  final List<VideoEntity> vids;
   final IVideoPlayerManager player;
   final int? startIndex;
-  _ScreenCubit(this.vids, this.player, this.startIndex)
-      : super(PlayScreenState(videos: vids)) {
-    logger.info('PlayScreen initialized with ${vids.length} videos');
+  final int? playlistId;
+  _ScreenCubit(
+      List<VideoEntity> vids, this.player, this.startIndex, this.playlistId)
+      : super(PlayScreenState(videos: List.from(vids))) {
+    logger.info(
+        'PlayScreen initialized with ${vids.length} videos, playlistId: $playlistId');
   }
 
   late VideoEntity _currentEntity;
   int _index = 0;
 
+  late final PositionMonitoringService _positionMonitor;
   StreamSubscription? _positionSubscription;
+
+  // Helper to get current videos list
+  List<VideoEntity> get vids => state.videos;
 
   @override
   FV init() async {
+    _positionMonitor = PositionMonitoringService(player: player);
+
     if (startIndex.isNotNull) {
       _currentEntity = vids[startIndex!];
     } else {
@@ -26,14 +34,41 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
     }
     final userPrefs = await UserDataManager().userPrefrences;
 
+    // Load playlist-specific settings if available
+    AutoPlayMode autoPlayMode = userPrefs.autoPlayMode;
+    int earlyTransitionSeconds = userPrefs.earlyTransitionSeconds;
+    int? introSkipSeconds;
+
+    if (playlistId != null) {
+      final playlists = await getIt<IPlaylistService>().getPlaylists();
+      final playlist = playlists.firstWhereOrNull((p) => p.id == playlistId);
+
+      if (playlist != null) {
+        // Use playlist-specific settings if available
+        if (playlist.autoPlayMode != null) {
+          autoPlayMode = AutoPlayMode.values.firstWhere(
+            (mode) => mode.name == playlist.autoPlayMode,
+            orElse: () => userPrefs.autoPlayMode,
+          );
+        }
+        if (playlist.earlyTransitionSeconds != null) {
+          earlyTransitionSeconds = playlist.earlyTransitionSeconds!;
+        }
+        introSkipSeconds = playlist.introSkipSeconds;
+        logger.info(
+            'Loaded playlist settings: mode=$autoPlayMode, seconds=$earlyTransitionSeconds, introSkip=$introSkipSeconds');
+      }
+    }
+
     emit(state.copyWith(
       canPlayNext: vids.last.id != _currentEntity.id,
       canPlayPrevious: vids.first.id == _currentEntity.id,
       currentPlaying: _currentEntity,
       volume: userPrefs.volume,
       isPlaying: true,
-      autoPlayMode: userPrefs.autoPlayMode,
-      earlyTransitionSeconds: userPrefs.earlyTransitionSeconds,
+      autoPlayMode: autoPlayMode,
+      earlyTransitionSeconds: earlyTransitionSeconds,
+      seekDurationSeconds: userPrefs.seekDurationSeconds,
     ));
 
     final jumpIndex = vids.indexWhere(
@@ -44,6 +79,9 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
     await player.open(vids);
 
     await player.jump(jump);
+
+    // Set seek duration from user preferences
+    await player.setSeekDuration(userPrefs.seekDurationSeconds);
 
     // Wait for video to be ready before seeking
     // await Future.delayed(const Duration(milliseconds: 500));
@@ -58,6 +96,7 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
     //   },
     // );
 
+    // Save position every 15 seconds without blocking UI
     final x = Stream<VideoEntity>.periodic(
       const Duration(seconds: 15),
       (computationCount) {
@@ -69,21 +108,50 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
     );
 
     x.listen(
-      (event) async {
-        final i = vids.indexWhere(
-          (e) => e.id == event.id,
-        );
+      (event) {
         _currentEntity = event;
-        vids.removeAt(i);
-        vids.insert(i, _currentEntity);
-        await getIt<IVideoService>().updateVideo(_currentEntity);
+
+        // Fire and forget - don't await to avoid blocking
+        getIt<IVideoService>().updateVideo(_currentEntity).catchError((e) {
+          logger.error('Failed to update video position', e);
+        });
       },
     );
 
     player.state.first.then((event) async {
-      if (_currentEntity.lastPositionSecond > 0) {
+      // Check if video is being played for the first time (never watched before)
+      // AND has a saved position less than 2 seconds (to avoid skipping when user manually seeks to start)
+      if (!_currentEntity.isWatched &&
+          _currentEntity.lastPositionSecond <= 2 &&
+          introSkipSeconds != null &&
+          introSkipSeconds > 0) {
+        // First time playing this video - skip intro
+        logger.info(
+            'First time playing video (not watched), skipping intro: $introSkipSeconds seconds');
+        await player.seek(introSkipSeconds);
+      } else if (_currentEntity.lastPositionSecond > 0) {
+        // Resume from last position
         await player.seek(_currentEntity.lastPositionSecond);
       }
+
+      // Load last selected subtitle if exists
+      if (_currentEntity.lastSelectedSubtitle != null) {
+        final subtitlePath = _currentEntity.lastSelectedSubtitle!;
+        if (File(subtitlePath).existsSync()) {
+          logger.info('Loading last selected subtitle: $subtitlePath');
+          await player.loadExternalSubtitle(subtitlePath);
+
+          // Apply saved subtitle offset
+          if (_currentEntity.subtitleOffset != 0.0) {
+            logger.info(
+                'Applying subtitle offset: ${_currentEntity.subtitleOffset}s');
+            await player.setSubtitleOffset(_currentEntity.subtitleOffset);
+          }
+        } else {
+          logger.warning('Last selected subtitle not found: $subtitlePath');
+        }
+      }
+
       _startPositionMonitoring();
     });
 
@@ -102,6 +170,22 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
     }
   }
 
+  FV markAsWatchedAndPlayNext() async {
+    try {
+      logger.info('Marking current video as watched and playing next');
+
+      // Mark current video as watched
+      await toggleWatch(_currentEntity);
+
+      // Play next video
+      await playNext();
+    } catch (e, stackTrace) {
+      errorHandler.handleError(
+          'PlayScreen markAsWatchedAndPlayNext', e, stackTrace);
+      rethrow;
+    }
+  }
+
   FV playPrevious() async {
     _index--;
     await player.jump(_index);
@@ -116,6 +200,26 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
       currentPlaying: _currentEntity,
       hasAutoTransitioned: false, // Reset flag for new video
     ));
+
+    // Load last selected subtitle for the new video
+    if (_currentEntity.lastSelectedSubtitle != null) {
+      final subtitlePath = _currentEntity.lastSelectedSubtitle!;
+      if (File(subtitlePath).existsSync()) {
+        logger.info(
+            'Loading last selected subtitle for new video: $subtitlePath');
+        await player.loadExternalSubtitle(subtitlePath);
+
+        // Apply saved subtitle offset
+        if (_currentEntity.subtitleOffset != 0.0) {
+          logger.info(
+              'Applying subtitle offset: ${_currentEntity.subtitleOffset}s');
+          await player.setSubtitleOffset(_currentEntity.subtitleOffset);
+        }
+      } else {
+        logger.warning('Last selected subtitle not found: $subtitlePath');
+      }
+    }
+
     await getIt<RecentVideosCubit>().update(_currentEntity);
   }
 
@@ -129,12 +233,28 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
       final index = vids.indexWhere(
         (e) => e.id == video.id,
       );
-      final x = video.copyWith(isWatched: true);
-      await getIt<IVideoService>().updateVideo(x);
-      vids.removeAt(index);
-      vids.insert(index, x);
-      emit(state.copyWith(videos: vids));
-      await getIt<IVideoService>().updateVideo(x);
+
+      if (index < 0) {
+        logger.error('Video not found in list: ${video.name}');
+        return;
+      }
+
+      final updatedVideo = video.copyWith(isWatched: true);
+
+      // Create new list with updated video
+      final updatedVids = List<VideoEntity>.from(vids);
+      updatedVids[index] = updatedVideo;
+
+      // Update state with new list
+      emit(state.copyWith(videos: updatedVids));
+
+      // Update in database
+      await getIt<IVideoService>().updateVideo(updatedVideo);
+
+      // Update current entity if it's the same video
+      if (_currentEntity.id == video.id) {
+        _currentEntity = updatedVideo;
+      }
     } catch (e, stackTrace) {
       errorHandler.handleError('PlayScreen toggleWatch', e, stackTrace);
       rethrow;
@@ -142,6 +262,12 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
   }
 
   FV playIndex(int index) async {
+    // Validate index
+    if (index < 0 || index >= vids.length) {
+      logger.error('Invalid index: $index, videos length: ${vids.length}');
+      return;
+    }
+
     _index = index;
     await player.jump(index);
     _currentEntity = vids[_index];
@@ -175,47 +301,120 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
     }
   }
 
+  void toggleFullscreen() {
+    // Toggle fullscreen using player manager
+    player.toggleFullscreen();
+  }
+
   FV setAudioTrack(String trackId) async {
     await player.setAudioTrack(trackId);
   }
 
   FV setSubtitleTrack(String trackId) async {
-    await player.setSubtitleTrack(trackId);
+    // Check if it's a downloaded subtitle (file path)
+    if (trackId.contains(path.separator) && File(trackId).existsSync()) {
+      await player.loadExternalSubtitle(trackId);
+
+      // Save as last selected subtitle
+      final updatedVideo = _currentEntity.copyWith(
+        lastSelectedSubtitle: trackId,
+      );
+      _currentEntity = updatedVideo;
+      await getIt<IVideoService>().updateVideo(updatedVideo);
+    } else {
+      await player.setSubtitleTrack(trackId);
+
+      // Save 'no' or track id as last selected
+      final updatedVideo = _currentEntity.copyWith(
+        lastSelectedSubtitle: trackId == 'no' ? null : trackId,
+      );
+      _currentEntity = updatedVideo;
+      await getIt<IVideoService>().updateVideo(updatedVideo);
+    }
+  }
+
+  FV loadLocalSubtitle(VideoEntity video) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['srt', 'vtt', 'ass', 'ssa', 'sub'],
+      );
+
+      if (result != null && result.files.first.path != null) {
+        final subtitlePath = result.files.first.path!;
+        logger.info('Loading local subtitle: $subtitlePath');
+
+        // Load into player
+        await player.loadExternalSubtitle(subtitlePath);
+
+        // Add to downloaded subtitles list if not already there
+        final updatedSubtitles = List<String>.from(video.downloadedSubtitles);
+        if (!updatedSubtitles.contains(subtitlePath)) {
+          updatedSubtitles.add(subtitlePath);
+        }
+
+        // Update video with new subtitle and set as last selected
+        final updatedVideo = video.copyWith(
+          downloadedSubtitles: updatedSubtitles,
+          lastSelectedSubtitle: subtitlePath,
+        );
+
+        _currentEntity = updatedVideo;
+        await getIt<IVideoService>().updateVideo(updatedVideo);
+
+        logger.info('Local subtitle loaded and saved successfully');
+      }
+    } catch (e, stackTrace) {
+      errorHandler.handleError('PlayScreen loadLocalSubtitle', e, stackTrace);
+      rethrow;
+    }
   }
 
   void _startPositionMonitoring() {
     _positionSubscription?.cancel();
+    _positionMonitor.stop();
 
-    _positionSubscription = Stream.periodic(
-      const Duration(seconds: 5),
-    ).listen((_) async {
-      try {
-        final position = player.position;
-        final duration = player.duration;
+    logger.info(
+        'Starting position monitoring for mode: ${state.autoPlayMode.name}');
+    _positionMonitor.start();
 
+    _positionSubscription = _positionMonitor.positionStream.listen(
+      (event) {
         // Skip if we don't have valid duration yet
-        if (duration.inSeconds == 0) {
+        if (!event.hasValidDuration) {
           return;
         }
 
-        final remaining = duration.inSeconds - position.inSeconds;
-
         // Only log every 5 seconds to avoid spam
-        if (remaining % 5 == 0) {
+        if (event.remainingSeconds % 5 == 0) {
           logger.debug(
-              'Position: ${position.inSeconds}s / ${duration.inSeconds}s, remaining: ${remaining}s, mode: ${state.autoPlayMode.name}');
+              'Position: ${event.position.inSeconds}s / ${event.duration.inSeconds}s, remaining: ${event.remainingSeconds}s, mode: ${state.autoPlayMode.name}');
+        }
+
+        // Manual mode - pause video when it ends to prevent auto-advance
+        if (state.autoPlayMode == AutoPlayMode.manual) {
+          if (event.remainingSeconds <= 2 && player.isPlaying) {
+            logger.info(
+                'Video ending in manual mode - pausing to prevent auto-advance');
+            player.pause();
+            // Mark video as watched when it ends in manual mode
+            if (event.remainingSeconds <= 1) {
+              toggleWatch(_currentEntity);
+            }
+          }
+          return;
         }
 
         // Early transition mode - show button at specified seconds
         if (state.autoPlayMode == AutoPlayMode.early) {
-          if (remaining <= state.earlyTransitionSeconds &&
-              remaining > 0 &&
+          if (event.remainingSeconds <= state.earlyTransitionSeconds &&
+              event.remainingSeconds > 0 &&
               state.canPlayNext &&
               !state.showNextEpisode) {
             logger.info(
-                'Showing next episode button (early mode), remaining: ${remaining}s');
+                'Showing next episode button (early mode), remaining: ${event.remainingSeconds}s');
             emit(state.copyWith(showNextEpisode: true));
-          } else if (remaining > state.earlyTransitionSeconds &&
+          } else if (event.remainingSeconds > state.earlyTransitionSeconds &&
               state.showNextEpisode) {
             emit(state.copyWith(showNextEpisode: false));
           }
@@ -223,34 +422,41 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
 
         // Auto transition mode - automatically transition at specified seconds
         if (state.autoPlayMode == AutoPlayMode.autoTransition) {
-          if (remaining <= state.earlyTransitionSeconds &&
-              remaining > 0 &&
+          if (event.remainingSeconds <= state.earlyTransitionSeconds &&
+              event.remainingSeconds > 0 &&
               state.canPlayNext &&
               !state.hasAutoTransitioned) {
             logger.info(
-                'Auto transitioning to next video, remaining: ${remaining}s');
+                'Auto transitioning to next video, remaining: ${event.remainingSeconds}s');
             emit(state.copyWith(hasAutoTransitioned: true));
-            await toggleWatch(_currentEntity);
-            await playNext();
+
+            // Schedule async work without blocking
+            _handleAutoTransition();
           }
         }
 
         // On complete mode - auto play when video ends
         if (state.autoPlayMode == AutoPlayMode.onComplete) {
-          if (remaining <= 1 && state.canPlayNext) {
+          if (event.remainingSeconds <= 1 &&
+              state.canPlayNext &&
+              !state.hasAutoTransitioned) {
             logger.info('Video completed, playing next');
-            await playNext();
+            emit(state.copyWith(hasAutoTransitioned: true));
+            // Schedule async work without blocking
+            _handleAutoTransition();
           }
         }
-      } catch (e, stackTrace) {
+      },
+      onError: (e, stackTrace) {
         logger.error('Error in position monitoring', e, stackTrace);
-      }
-    });
+      },
+    );
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     _positionSubscription?.cancel();
+    _positionMonitor.dispose();
     return super.close();
   }
 
@@ -258,17 +464,189 @@ final class _ScreenCubit extends BaseCubit<PlayScreenState> {
     emit(state.copyWith(showNextEpisode: false));
   }
 
+  Future<void> _handleAutoTransition() async {
+    try {
+      await toggleWatch(_currentEntity);
+      await playNext();
+    } catch (e, stackTrace) {
+      logger.error('Error in auto transition', e, stackTrace);
+    }
+  }
+
   void setAutoPlayMode(AutoPlayMode mode) async {
     logger.info('Auto play mode changed to: ${mode.displayName}');
     emit(state.copyWith(autoPlayMode: mode));
-    await UserDataManager().setAutoPlayMode(mode.name);
+
+    // Save to playlist if we're in a playlist
+    if (playlistId != null) {
+      final playlists = await getIt<IPlaylistService>().getPlaylists();
+      final playlist = playlists.firstWhereOrNull((p) => p.id == playlistId);
+
+      if (playlist != null) {
+        final updatedPlaylist = playlist.copyWith(
+          autoPlayMode: mode.name,
+        );
+        await getIt<IPlaylistService>().updatePlaylist(updatedPlaylist);
+        logger.info('Saved autoPlayMode to playlist: ${mode.name}');
+      }
+    } else {
+      // Save to global settings if not in a playlist
+      await UserDataManager().setAutoPlayMode(mode.name);
+    }
+
+    // Restart monitoring based on new mode
+    _startPositionMonitoring();
   }
 
   void setEarlyTransitionSeconds(int seconds) async {
     emit(state.copyWith(earlyTransitionSeconds: seconds));
-    await UserDataManager().setEarlyTransitionSeconds(seconds);
+
+    // Save to playlist if we're in a playlist
+    if (playlistId != null) {
+      final playlists = await getIt<IPlaylistService>().getPlaylists();
+      final playlist = playlists.firstWhereOrNull((p) => p.id == playlistId);
+
+      if (playlist != null) {
+        final updatedPlaylist = playlist.copyWith(
+          earlyTransitionSeconds: seconds,
+        );
+        await getIt<IPlaylistService>().updatePlaylist(updatedPlaylist);
+        logger.info('Saved earlyTransitionSeconds to playlist: $seconds');
+      }
+    } else {
+      // Save to global settings if not in a playlist
+      await UserDataManager().setEarlyTransitionSeconds(seconds);
+    }
   }
 
   List<Map<String, String>> get audioTracks => player.audioTracks;
-  List<Map<String, String>> get subtitleTracks => player.subtitleTracks;
+
+  List<Map<String, String>> get subtitleTracks {
+    final tracks = player.subtitleTracks;
+
+    // Add downloaded subtitles to the list
+    if (_currentEntity.downloadedSubtitles.isNotEmpty) {
+      for (final subtitlePath in _currentEntity.downloadedSubtitles) {
+        final fileName = path.basename(subtitlePath);
+        tracks.add({
+          'id': subtitlePath,
+          'title': fileName,
+          'language': 'Downloaded',
+        });
+      }
+    }
+
+    return tracks;
+  }
+
+  FV adjustSubtitleOffset(double offsetChange) async {
+    try {
+      final newOffset = _currentEntity.subtitleOffset + offsetChange;
+      logger.info(
+          'Adjusting subtitle offset: ${_currentEntity.subtitleOffset}s -> ${newOffset}s');
+
+      await player.setSubtitleOffset(newOffset);
+
+      // Save to database
+      final updatedVideo = _currentEntity.copyWith(
+        subtitleOffset: newOffset,
+      );
+      _currentEntity = updatedVideo;
+      await getIt<IVideoService>().updateVideo(updatedVideo);
+
+      logger.info('Subtitle offset saved: ${newOffset}s');
+    } catch (e, stackTrace) {
+      errorHandler.handleError(
+          'PlayScreen adjustSubtitleOffset', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  FV resetSubtitleOffset() async {
+    try {
+      logger.info('Resetting subtitle offset to 0');
+
+      await player.setSubtitleOffset(0.0);
+
+      // Save to database
+      final updatedVideo = _currentEntity.copyWith(
+        subtitleOffset: 0.0,
+      );
+      _currentEntity = updatedVideo;
+      await getIt<IVideoService>().updateVideo(updatedVideo);
+
+      logger.info('Subtitle offset reset');
+    } catch (e, stackTrace) {
+      errorHandler.handleError('PlayScreen resetSubtitleOffset', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  double get currentSubtitleOffset => _currentEntity.subtitleOffset;
+
+  FV setSeekDuration(int seconds) async {
+    try {
+      logger.info('Setting seek duration: ${seconds}s');
+      await player.setSeekDuration(seconds);
+      await UserDataManager().setSeekDurationSeconds(seconds);
+      emit(state.copyWith(seekDurationSeconds: seconds));
+    } catch (e, stackTrace) {
+      errorHandler.handleError('PlayScreen setSeekDuration', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  // Video Notes Methods
+  void toggleNotes() {
+    emit(state.copyWith(showNotes: !state.showNotes));
+  }
+
+  Future<List<VideoNoteEntity>> getNotesForCurrentVideo() async {
+    try {
+      return await getIt<IVideoNoteService>()
+          .getNotesForVideo(_currentEntity.id);
+    } catch (e, stackTrace) {
+      errorHandler.handleError(
+          'PlayScreen getNotesForCurrentVideo', e, stackTrace);
+      return [];
+    }
+  }
+
+  FV addNote(String noteText) async {
+    try {
+      final timestamp = player.position.inSeconds;
+      logger.info('Adding note at $timestamp seconds: $noteText');
+
+      await getIt<IVideoNoteService>().createNote(
+        videoId: _currentEntity.id,
+        timestampSeconds: timestamp,
+        noteText: noteText,
+      );
+
+      logger.info('Note added successfully');
+    } catch (e, stackTrace) {
+      errorHandler.handleError('PlayScreen addNote', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  FV deleteNote(int noteId) async {
+    try {
+      await getIt<IVideoNoteService>().deleteNote(noteId);
+      logger.info('Note $noteId deleted');
+    } catch (e, stackTrace) {
+      errorHandler.handleError('PlayScreen deleteNote', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  FV seekToNote(int timestampSeconds) async {
+    try {
+      await player.seek(timestampSeconds);
+      logger.info('Seeked to note timestamp: $timestampSeconds');
+    } catch (e, stackTrace) {
+      errorHandler.handleError('PlayScreen seekToNote', e, stackTrace);
+      rethrow;
+    }
+  }
 }

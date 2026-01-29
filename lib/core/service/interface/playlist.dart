@@ -9,4 +9,5 @@ abstract class IPlaylistService {
   Future<PlaylistProgressResponseModel> getPlaylistState(int id);
   Future<List<PlaylistStateResponseModel>> getPlaylistStates();
   Future removePlaylist(int id);
+  Future<void> updatePlaylist(Playlist playlist);
 }

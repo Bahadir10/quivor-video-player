@@ -79,7 +79,7 @@ class _EndField extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Playlist',
+                        LocaleKeys.playlist_title.tr(),
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.grey1,
                           fontSize: 11,
@@ -118,13 +118,13 @@ class _EndField extends StatelessWidget {
                 children: [
                   _StatBadge(
                     icon: Icons.video_library,
-                    label: 'Total',
+                    label: LocaleKeys.playlist_total.tr(),
                     value: '${videos.length}',
                   ),
                   const SizedBox(width: 12),
                   _StatBadge(
                     icon: Icons.check_circle_outline,
-                    label: 'İzlendi',
+                    label: LocaleKeys.playlist_watched.tr(),
                     value: '${videos.where((v) => v.isWatched).length}',
                   ),
                 ],
@@ -158,8 +158,12 @@ class _EndField extends StatelessWidget {
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () async =>
-                            await cubit.playIndex(videos.indexOf(video)),
+                        onTap: () async {
+                          final videoIndex = videos.indexOf(video);
+                          if (videoIndex >= 0) {
+                            await cubit.playIndex(videoIndex);
+                          }
+                        },
                         borderRadius: BorderRadius.circular(10),
                         child: Padding(
                           padding: const EdgeInsets.all(12),

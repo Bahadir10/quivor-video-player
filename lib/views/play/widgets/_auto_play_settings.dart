@@ -26,7 +26,7 @@ class _AutoPlaySettings extends StatelessWidget {
                     const Icon(Icons.auto_awesome, size: 24),
                     const SizedBox(width: 8),
                     Text(
-                      'Otomatik Oynatma',
+                      LocaleKeys.autoplay_title.tr(),
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -112,7 +112,7 @@ class _AutoPlaySettings extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          'Son ${state.earlyTransitionSeconds} saniye',
+                          '${LocaleKeys.autoplay_transition_time.tr()}: ${state.earlyTransitionSeconds} ${LocaleKeys.autoplay_seconds.tr()}',
                           style: AppTypography.bodyMedium.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

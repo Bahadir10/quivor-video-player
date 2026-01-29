@@ -1,0 +1,29 @@
+🎉 Yeni Özellikler v1.4.0
+
+⌨️ Klavye Kısayolları
+• Tam klavye kontrolü (Space, Ok tuşları, vb.)
+• Ayarlar'dan özelleştirilebilir kısayollar
+• Eller serbest video kontrolü
+
+⏱️ Altyazı Senkronizasyonu
+• Altyazı zamanlamasını ayarlama (-5s ile +5s arası)
+• Her video için ayrı offset değeri
+• Otomatik kaydetme
+
+🎬 Ayarlanabilir İleri/Geri Sarma
+• 5, 10, 15, 30 veya 60 saniye seçenekleri
+• Klavye ve butonlar için geçerli
+• Tercihler kaydediliyor
+
+📝 Video Notları (Udemy Tarzı)
+• Videolara zaman damgalı not ekleme
+• Nota tıklayarak o ana geri dönme
+• Her video için ayrı notlar
+• Ders çalışma ve inceleme için mükemmel
+
+🐛 Hata Düzeltmeleri
+• Klavye kısayolları hataları düzeltildi
+• Geri sarma yönü düzeltildi
+• Performans iyileştirmeleri
+
+📚 Daha fazla bilgi için uygulama içi yardıma bakın!

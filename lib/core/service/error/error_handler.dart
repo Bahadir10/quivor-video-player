@@ -38,8 +38,15 @@ class ErrorHandler {
     logger.error('Error in $context', error, stackTrace);
   }
 
-  // Handle and show user-friendly error messages
+  // Get user-friendly error message for UI display
+  // Note: Logs remain detailed, this is only for user-facing messages
   String getUserFriendlyMessage(dynamic error) {
+    // In debug mode, show detailed error on screen
+    if (kDebugMode) {
+      return 'DEBUG: ${error.toString()}';
+    }
+
+    // In release mode, show user-friendly messages on screen
     if (error is TimeoutException) {
       return 'İşlem zaman aşımına uğradı. Lütfen tekrar deneyin.';
     } else if (error is FormatException) {
@@ -48,8 +55,11 @@ class ErrorHandler {
       return 'İnternet bağlantısı yok.';
     } else if (error.toString().contains('HttpException')) {
       return 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.';
+    } else if (error.toString().contains('SqliteException') ||
+        error.toString().contains('DriftRemoteException')) {
+      return 'Veritabanı hatası oluştu. Lütfen uygulamayı yeniden başlatın.';
     } else {
-      return 'Bir hata oluştu. Lütfen tekrar deneyin.';
+      return 'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
     }
   }
 }

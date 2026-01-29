@@ -15,5 +15,7 @@ class PlayScreenState with _$PlayScreenState {
     @Default(AutoPlayMode.early) AutoPlayMode autoPlayMode,
     @Default(15) int earlyTransitionSeconds,
     @Default(false) bool hasAutoTransitioned,
+    @Default(10) int seekDurationSeconds,
+    @Default(false) bool showNotes,
   }) = _$PlayScreenStateImpl;
 }

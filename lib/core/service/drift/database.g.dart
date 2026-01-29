@@ -57,9 +57,41 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: const Constant(0));
+  static const VerificationMeta _downloadedSubtitlesMeta =
+      const VerificationMeta('downloadedSubtitles');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, name, path, isWatched, categoryId, playlistId, lastPositionSecond];
+  late final GeneratedColumn<String> downloadedSubtitles =
+      GeneratedColumn<String>('downloaded_subtitles', aliasedName, false,
+          type: DriftSqlType.string,
+          requiredDuringInsert: false,
+          defaultValue: const Constant('[]'));
+  static const VerificationMeta _lastSelectedSubtitleMeta =
+      const VerificationMeta('lastSelectedSubtitle');
+  @override
+  late final GeneratedColumn<String> lastSelectedSubtitle =
+      GeneratedColumn<String>('last_selected_subtitle', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _subtitleOffsetMeta =
+      const VerificationMeta('subtitleOffset');
+  @override
+  late final GeneratedColumn<double> subtitleOffset = GeneratedColumn<double>(
+      'subtitle_offset', aliasedName, false,
+      type: DriftSqlType.double,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0.0));
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        name,
+        path,
+        isWatched,
+        categoryId,
+        playlistId,
+        lastPositionSecond,
+        downloadedSubtitles,
+        lastSelectedSubtitle,
+        subtitleOffset
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -107,6 +139,24 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
           lastPositionSecond.isAcceptableOrUnknown(
               data['last_position_second']!, _lastPositionSecondMeta));
     }
+    if (data.containsKey('downloaded_subtitles')) {
+      context.handle(
+          _downloadedSubtitlesMeta,
+          downloadedSubtitles.isAcceptableOrUnknown(
+              data['downloaded_subtitles']!, _downloadedSubtitlesMeta));
+    }
+    if (data.containsKey('last_selected_subtitle')) {
+      context.handle(
+          _lastSelectedSubtitleMeta,
+          lastSelectedSubtitle.isAcceptableOrUnknown(
+              data['last_selected_subtitle']!, _lastSelectedSubtitleMeta));
+    }
+    if (data.containsKey('subtitle_offset')) {
+      context.handle(
+          _subtitleOffsetMeta,
+          subtitleOffset.isAcceptableOrUnknown(
+              data['subtitle_offset']!, _subtitleOffsetMeta));
+    }
     return context;
   }
 
@@ -130,6 +180,13 @@ class $VideosTable extends Videos with TableInfo<$VideosTable, Video> {
           .read(DriftSqlType.int, data['${effectivePrefix}playlist_id']),
       lastPositionSecond: attachedDatabase.typeMapping.read(
           DriftSqlType.int, data['${effectivePrefix}last_position_second'])!,
+      downloadedSubtitles: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}downloaded_subtitles'])!,
+      lastSelectedSubtitle: attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}last_selected_subtitle']),
+      subtitleOffset: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}subtitle_offset'])!,
     );
   }
 
@@ -147,6 +204,9 @@ class Video extends DataClass implements Insertable<Video> {
   final int? categoryId;
   final int? playlistId;
   final int lastPositionSecond;
+  final String downloadedSubtitles;
+  final String? lastSelectedSubtitle;
+  final double subtitleOffset;
   const Video(
       {required this.id,
       required this.name,
@@ -154,7 +214,10 @@ class Video extends DataClass implements Insertable<Video> {
       required this.isWatched,
       this.categoryId,
       this.playlistId,
-      required this.lastPositionSecond});
+      required this.lastPositionSecond,
+      required this.downloadedSubtitles,
+      this.lastSelectedSubtitle,
+      required this.subtitleOffset});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -169,6 +232,11 @@ class Video extends DataClass implements Insertable<Video> {
       map['playlist_id'] = Variable<int>(playlistId);
     }
     map['last_position_second'] = Variable<int>(lastPositionSecond);
+    map['downloaded_subtitles'] = Variable<String>(downloadedSubtitles);
+    if (!nullToAbsent || lastSelectedSubtitle != null) {
+      map['last_selected_subtitle'] = Variable<String>(lastSelectedSubtitle);
+    }
+    map['subtitle_offset'] = Variable<double>(subtitleOffset);
     return map;
   }
 
@@ -185,6 +253,11 @@ class Video extends DataClass implements Insertable<Video> {
           ? const Value.absent()
           : Value(playlistId),
       lastPositionSecond: Value(lastPositionSecond),
+      downloadedSubtitles: Value(downloadedSubtitles),
+      lastSelectedSubtitle: lastSelectedSubtitle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSelectedSubtitle),
+      subtitleOffset: Value(subtitleOffset),
     );
   }
 
@@ -199,6 +272,11 @@ class Video extends DataClass implements Insertable<Video> {
       categoryId: serializer.fromJson<int?>(json['categoryId']),
       playlistId: serializer.fromJson<int?>(json['playlistId']),
       lastPositionSecond: serializer.fromJson<int>(json['lastPositionSecond']),
+      downloadedSubtitles:
+          serializer.fromJson<String>(json['downloadedSubtitles']),
+      lastSelectedSubtitle:
+          serializer.fromJson<String?>(json['lastSelectedSubtitle']),
+      subtitleOffset: serializer.fromJson<double>(json['subtitleOffset']),
     );
   }
   @override
@@ -212,6 +290,9 @@ class Video extends DataClass implements Insertable<Video> {
       'categoryId': serializer.toJson<int?>(categoryId),
       'playlistId': serializer.toJson<int?>(playlistId),
       'lastPositionSecond': serializer.toJson<int>(lastPositionSecond),
+      'downloadedSubtitles': serializer.toJson<String>(downloadedSubtitles),
+      'lastSelectedSubtitle': serializer.toJson<String?>(lastSelectedSubtitle),
+      'subtitleOffset': serializer.toJson<double>(subtitleOffset),
     };
   }
 
@@ -222,7 +303,10 @@ class Video extends DataClass implements Insertable<Video> {
           bool? isWatched,
           Value<int?> categoryId = const Value.absent(),
           Value<int?> playlistId = const Value.absent(),
-          int? lastPositionSecond}) =>
+          int? lastPositionSecond,
+          String? downloadedSubtitles,
+          Value<String?> lastSelectedSubtitle = const Value.absent(),
+          double? subtitleOffset}) =>
       Video(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -231,6 +315,11 @@ class Video extends DataClass implements Insertable<Video> {
         categoryId: categoryId.present ? categoryId.value : this.categoryId,
         playlistId: playlistId.present ? playlistId.value : this.playlistId,
         lastPositionSecond: lastPositionSecond ?? this.lastPositionSecond,
+        downloadedSubtitles: downloadedSubtitles ?? this.downloadedSubtitles,
+        lastSelectedSubtitle: lastSelectedSubtitle.present
+            ? lastSelectedSubtitle.value
+            : this.lastSelectedSubtitle,
+        subtitleOffset: subtitleOffset ?? this.subtitleOffset,
       );
   @override
   String toString() {
@@ -241,14 +330,26 @@ class Video extends DataClass implements Insertable<Video> {
           ..write('isWatched: $isWatched, ')
           ..write('categoryId: $categoryId, ')
           ..write('playlistId: $playlistId, ')
-          ..write('lastPositionSecond: $lastPositionSecond')
+          ..write('lastPositionSecond: $lastPositionSecond, ')
+          ..write('downloadedSubtitles: $downloadedSubtitles, ')
+          ..write('lastSelectedSubtitle: $lastSelectedSubtitle, ')
+          ..write('subtitleOffset: $subtitleOffset')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(
-      id, name, path, isWatched, categoryId, playlistId, lastPositionSecond);
+      id,
+      name,
+      path,
+      isWatched,
+      categoryId,
+      playlistId,
+      lastPositionSecond,
+      downloadedSubtitles,
+      lastSelectedSubtitle,
+      subtitleOffset);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -259,7 +360,10 @@ class Video extends DataClass implements Insertable<Video> {
           other.isWatched == this.isWatched &&
           other.categoryId == this.categoryId &&
           other.playlistId == this.playlistId &&
-          other.lastPositionSecond == this.lastPositionSecond);
+          other.lastPositionSecond == this.lastPositionSecond &&
+          other.downloadedSubtitles == this.downloadedSubtitles &&
+          other.lastSelectedSubtitle == this.lastSelectedSubtitle &&
+          other.subtitleOffset == this.subtitleOffset);
 }
 
 class VideosCompanion extends UpdateCompanion<Video> {
@@ -270,6 +374,9 @@ class VideosCompanion extends UpdateCompanion<Video> {
   final Value<int?> categoryId;
   final Value<int?> playlistId;
   final Value<int> lastPositionSecond;
+  final Value<String> downloadedSubtitles;
+  final Value<String?> lastSelectedSubtitle;
+  final Value<double> subtitleOffset;
   const VideosCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -278,6 +385,9 @@ class VideosCompanion extends UpdateCompanion<Video> {
     this.categoryId = const Value.absent(),
     this.playlistId = const Value.absent(),
     this.lastPositionSecond = const Value.absent(),
+    this.downloadedSubtitles = const Value.absent(),
+    this.lastSelectedSubtitle = const Value.absent(),
+    this.subtitleOffset = const Value.absent(),
   });
   VideosCompanion.insert({
     this.id = const Value.absent(),
@@ -287,6 +397,9 @@ class VideosCompanion extends UpdateCompanion<Video> {
     this.categoryId = const Value.absent(),
     this.playlistId = const Value.absent(),
     this.lastPositionSecond = const Value.absent(),
+    this.downloadedSubtitles = const Value.absent(),
+    this.lastSelectedSubtitle = const Value.absent(),
+    this.subtitleOffset = const Value.absent(),
   })  : name = Value(name),
         path = Value(path);
   static Insertable<Video> custom({
@@ -297,6 +410,9 @@ class VideosCompanion extends UpdateCompanion<Video> {
     Expression<int>? categoryId,
     Expression<int>? playlistId,
     Expression<int>? lastPositionSecond,
+    Expression<String>? downloadedSubtitles,
+    Expression<String>? lastSelectedSubtitle,
+    Expression<double>? subtitleOffset,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -307,6 +423,11 @@ class VideosCompanion extends UpdateCompanion<Video> {
       if (playlistId != null) 'playlist_id': playlistId,
       if (lastPositionSecond != null)
         'last_position_second': lastPositionSecond,
+      if (downloadedSubtitles != null)
+        'downloaded_subtitles': downloadedSubtitles,
+      if (lastSelectedSubtitle != null)
+        'last_selected_subtitle': lastSelectedSubtitle,
+      if (subtitleOffset != null) 'subtitle_offset': subtitleOffset,
     });
   }
 
@@ -317,7 +438,10 @@ class VideosCompanion extends UpdateCompanion<Video> {
       Value<bool>? isWatched,
       Value<int?>? categoryId,
       Value<int?>? playlistId,
-      Value<int>? lastPositionSecond}) {
+      Value<int>? lastPositionSecond,
+      Value<String>? downloadedSubtitles,
+      Value<String?>? lastSelectedSubtitle,
+      Value<double>? subtitleOffset}) {
     return VideosCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -326,6 +450,9 @@ class VideosCompanion extends UpdateCompanion<Video> {
       categoryId: categoryId ?? this.categoryId,
       playlistId: playlistId ?? this.playlistId,
       lastPositionSecond: lastPositionSecond ?? this.lastPositionSecond,
+      downloadedSubtitles: downloadedSubtitles ?? this.downloadedSubtitles,
+      lastSelectedSubtitle: lastSelectedSubtitle ?? this.lastSelectedSubtitle,
+      subtitleOffset: subtitleOffset ?? this.subtitleOffset,
     );
   }
 
@@ -353,6 +480,16 @@ class VideosCompanion extends UpdateCompanion<Video> {
     if (lastPositionSecond.present) {
       map['last_position_second'] = Variable<int>(lastPositionSecond.value);
     }
+    if (downloadedSubtitles.present) {
+      map['downloaded_subtitles'] = Variable<String>(downloadedSubtitles.value);
+    }
+    if (lastSelectedSubtitle.present) {
+      map['last_selected_subtitle'] =
+          Variable<String>(lastSelectedSubtitle.value);
+    }
+    if (subtitleOffset.present) {
+      map['subtitle_offset'] = Variable<double>(subtitleOffset.value);
+    }
     return map;
   }
 
@@ -365,7 +502,10 @@ class VideosCompanion extends UpdateCompanion<Video> {
           ..write('isWatched: $isWatched, ')
           ..write('categoryId: $categoryId, ')
           ..write('playlistId: $playlistId, ')
-          ..write('lastPositionSecond: $lastPositionSecond')
+          ..write('lastPositionSecond: $lastPositionSecond, ')
+          ..write('downloadedSubtitles: $downloadedSubtitles, ')
+          ..write('lastSelectedSubtitle: $lastSelectedSubtitle, ')
+          ..write('subtitleOffset: $subtitleOffset')
           ..write(')'))
         .toString();
   }
@@ -391,8 +531,27 @@ class $PlaylistsTable extends Playlists
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _autoPlayModeMeta =
+      const VerificationMeta('autoPlayMode');
   @override
-  List<GeneratedColumn> get $columns => [id, name];
+  late final GeneratedColumn<String> autoPlayMode = GeneratedColumn<String>(
+      'auto_play_mode', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _earlyTransitionSecondsMeta =
+      const VerificationMeta('earlyTransitionSeconds');
+  @override
+  late final GeneratedColumn<int> earlyTransitionSeconds = GeneratedColumn<int>(
+      'early_transition_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _introSkipSecondsMeta =
+      const VerificationMeta('introSkipSeconds');
+  @override
+  late final GeneratedColumn<int> introSkipSeconds = GeneratedColumn<int>(
+      'intro_skip_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, name, autoPlayMode, earlyTransitionSeconds, introSkipSeconds];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -412,6 +571,24 @@ class $PlaylistsTable extends Playlists
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('auto_play_mode')) {
+      context.handle(
+          _autoPlayModeMeta,
+          autoPlayMode.isAcceptableOrUnknown(
+              data['auto_play_mode']!, _autoPlayModeMeta));
+    }
+    if (data.containsKey('early_transition_seconds')) {
+      context.handle(
+          _earlyTransitionSecondsMeta,
+          earlyTransitionSeconds.isAcceptableOrUnknown(
+              data['early_transition_seconds']!, _earlyTransitionSecondsMeta));
+    }
+    if (data.containsKey('intro_skip_seconds')) {
+      context.handle(
+          _introSkipSecondsMeta,
+          introSkipSeconds.isAcceptableOrUnknown(
+              data['intro_skip_seconds']!, _introSkipSecondsMeta));
+    }
     return context;
   }
 
@@ -425,6 +602,12 @@ class $PlaylistsTable extends Playlists
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      autoPlayMode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}auto_play_mode']),
+      earlyTransitionSeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}early_transition_seconds']),
+      introSkipSeconds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}intro_skip_seconds']),
     );
   }
 
@@ -437,12 +620,29 @@ class $PlaylistsTable extends Playlists
 class Playlist extends DataClass implements Insertable<Playlist> {
   final int id;
   final String name;
-  const Playlist({required this.id, required this.name});
+  final String? autoPlayMode;
+  final int? earlyTransitionSeconds;
+  final int? introSkipSeconds;
+  const Playlist(
+      {required this.id,
+      required this.name,
+      this.autoPlayMode,
+      this.earlyTransitionSeconds,
+      this.introSkipSeconds});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || autoPlayMode != null) {
+      map['auto_play_mode'] = Variable<String>(autoPlayMode);
+    }
+    if (!nullToAbsent || earlyTransitionSeconds != null) {
+      map['early_transition_seconds'] = Variable<int>(earlyTransitionSeconds);
+    }
+    if (!nullToAbsent || introSkipSeconds != null) {
+      map['intro_skip_seconds'] = Variable<int>(introSkipSeconds);
+    }
     return map;
   }
 
@@ -450,6 +650,15 @@ class Playlist extends DataClass implements Insertable<Playlist> {
     return PlaylistsCompanion(
       id: Value(id),
       name: Value(name),
+      autoPlayMode: autoPlayMode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(autoPlayMode),
+      earlyTransitionSeconds: earlyTransitionSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(earlyTransitionSeconds),
+      introSkipSeconds: introSkipSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(introSkipSeconds),
     );
   }
 
@@ -459,6 +668,10 @@ class Playlist extends DataClass implements Insertable<Playlist> {
     return Playlist(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      autoPlayMode: serializer.fromJson<String?>(json['autoPlayMode']),
+      earlyTransitionSeconds:
+          serializer.fromJson<int?>(json['earlyTransitionSeconds']),
+      introSkipSeconds: serializer.fromJson<int?>(json['introSkipSeconds']),
     );
   }
   @override
@@ -467,55 +680,106 @@ class Playlist extends DataClass implements Insertable<Playlist> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
+      'autoPlayMode': serializer.toJson<String?>(autoPlayMode),
+      'earlyTransitionSeconds': serializer.toJson<int?>(earlyTransitionSeconds),
+      'introSkipSeconds': serializer.toJson<int?>(introSkipSeconds),
     };
   }
 
-  Playlist copyWith({int? id, String? name}) => Playlist(
+  Playlist copyWith(
+          {int? id,
+          String? name,
+          Value<String?> autoPlayMode = const Value.absent(),
+          Value<int?> earlyTransitionSeconds = const Value.absent(),
+          Value<int?> introSkipSeconds = const Value.absent()}) =>
+      Playlist(
         id: id ?? this.id,
         name: name ?? this.name,
+        autoPlayMode:
+            autoPlayMode.present ? autoPlayMode.value : this.autoPlayMode,
+        earlyTransitionSeconds: earlyTransitionSeconds.present
+            ? earlyTransitionSeconds.value
+            : this.earlyTransitionSeconds,
+        introSkipSeconds: introSkipSeconds.present
+            ? introSkipSeconds.value
+            : this.introSkipSeconds,
       );
   @override
   String toString() {
     return (StringBuffer('Playlist(')
           ..write('id: $id, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('autoPlayMode: $autoPlayMode, ')
+          ..write('earlyTransitionSeconds: $earlyTransitionSeconds, ')
+          ..write('introSkipSeconds: $introSkipSeconds')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name);
+  int get hashCode => Object.hash(
+      id, name, autoPlayMode, earlyTransitionSeconds, introSkipSeconds);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Playlist && other.id == this.id && other.name == this.name);
+      (other is Playlist &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.autoPlayMode == this.autoPlayMode &&
+          other.earlyTransitionSeconds == this.earlyTransitionSeconds &&
+          other.introSkipSeconds == this.introSkipSeconds);
 }
 
 class PlaylistsCompanion extends UpdateCompanion<Playlist> {
   final Value<int> id;
   final Value<String> name;
+  final Value<String?> autoPlayMode;
+  final Value<int?> earlyTransitionSeconds;
+  final Value<int?> introSkipSeconds;
   const PlaylistsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.autoPlayMode = const Value.absent(),
+    this.earlyTransitionSeconds = const Value.absent(),
+    this.introSkipSeconds = const Value.absent(),
   });
   PlaylistsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
+    this.autoPlayMode = const Value.absent(),
+    this.earlyTransitionSeconds = const Value.absent(),
+    this.introSkipSeconds = const Value.absent(),
   }) : name = Value(name);
   static Insertable<Playlist> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<String>? autoPlayMode,
+    Expression<int>? earlyTransitionSeconds,
+    Expression<int>? introSkipSeconds,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (autoPlayMode != null) 'auto_play_mode': autoPlayMode,
+      if (earlyTransitionSeconds != null)
+        'early_transition_seconds': earlyTransitionSeconds,
+      if (introSkipSeconds != null) 'intro_skip_seconds': introSkipSeconds,
     });
   }
 
-  PlaylistsCompanion copyWith({Value<int>? id, Value<String>? name}) {
+  PlaylistsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? name,
+      Value<String?>? autoPlayMode,
+      Value<int?>? earlyTransitionSeconds,
+      Value<int?>? introSkipSeconds}) {
     return PlaylistsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      autoPlayMode: autoPlayMode ?? this.autoPlayMode,
+      earlyTransitionSeconds:
+          earlyTransitionSeconds ?? this.earlyTransitionSeconds,
+      introSkipSeconds: introSkipSeconds ?? this.introSkipSeconds,
     );
   }
 
@@ -528,6 +792,16 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (autoPlayMode.present) {
+      map['auto_play_mode'] = Variable<String>(autoPlayMode.value);
+    }
+    if (earlyTransitionSeconds.present) {
+      map['early_transition_seconds'] =
+          Variable<int>(earlyTransitionSeconds.value);
+    }
+    if (introSkipSeconds.present) {
+      map['intro_skip_seconds'] = Variable<int>(introSkipSeconds.value);
+    }
     return map;
   }
 
@@ -535,7 +809,10 @@ class PlaylistsCompanion extends UpdateCompanion<Playlist> {
   String toString() {
     return (StringBuffer('PlaylistsCompanion(')
           ..write('id: $id, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('autoPlayMode: $autoPlayMode, ')
+          ..write('earlyTransitionSeconds: $earlyTransitionSeconds, ')
+          ..write('introSkipSeconds: $introSkipSeconds')
           ..write(')'))
         .toString();
   }
@@ -916,16 +1193,308 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   }
 }
 
+class $VideoNotesTable extends VideoNotes
+    with TableInfo<$VideoNotesTable, VideoNote> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VideoNotesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _videoIdMeta =
+      const VerificationMeta('videoId');
+  @override
+  late final GeneratedColumn<int> videoId = GeneratedColumn<int>(
+      'video_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _timestampSecondsMeta =
+      const VerificationMeta('timestampSeconds');
+  @override
+  late final GeneratedColumn<int> timestampSeconds = GeneratedColumn<int>(
+      'timestamp_seconds', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _noteTextMeta =
+      const VerificationMeta('noteText');
+  @override
+  late final GeneratedColumn<String> noteText = GeneratedColumn<String>(
+      'note_text', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, videoId, timestampSeconds, noteText, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'video_notes';
+  @override
+  VerificationContext validateIntegrity(Insertable<VideoNote> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('video_id')) {
+      context.handle(_videoIdMeta,
+          videoId.isAcceptableOrUnknown(data['video_id']!, _videoIdMeta));
+    } else if (isInserting) {
+      context.missing(_videoIdMeta);
+    }
+    if (data.containsKey('timestamp_seconds')) {
+      context.handle(
+          _timestampSecondsMeta,
+          timestampSeconds.isAcceptableOrUnknown(
+              data['timestamp_seconds']!, _timestampSecondsMeta));
+    } else if (isInserting) {
+      context.missing(_timestampSecondsMeta);
+    }
+    if (data.containsKey('note_text')) {
+      context.handle(_noteTextMeta,
+          noteText.isAcceptableOrUnknown(data['note_text']!, _noteTextMeta));
+    } else if (isInserting) {
+      context.missing(_noteTextMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  VideoNote map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VideoNote(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      videoId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}video_id'])!,
+      timestampSeconds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}timestamp_seconds'])!,
+      noteText: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}note_text'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $VideoNotesTable createAlias(String alias) {
+    return $VideoNotesTable(attachedDatabase, alias);
+  }
+}
+
+class VideoNote extends DataClass implements Insertable<VideoNote> {
+  final int id;
+  final int videoId;
+  final int timestampSeconds;
+  final String noteText;
+  final DateTime createdAt;
+  const VideoNote(
+      {required this.id,
+      required this.videoId,
+      required this.timestampSeconds,
+      required this.noteText,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['video_id'] = Variable<int>(videoId);
+    map['timestamp_seconds'] = Variable<int>(timestampSeconds);
+    map['note_text'] = Variable<String>(noteText);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  VideoNotesCompanion toCompanion(bool nullToAbsent) {
+    return VideoNotesCompanion(
+      id: Value(id),
+      videoId: Value(videoId),
+      timestampSeconds: Value(timestampSeconds),
+      noteText: Value(noteText),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory VideoNote.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VideoNote(
+      id: serializer.fromJson<int>(json['id']),
+      videoId: serializer.fromJson<int>(json['videoId']),
+      timestampSeconds: serializer.fromJson<int>(json['timestampSeconds']),
+      noteText: serializer.fromJson<String>(json['noteText']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'videoId': serializer.toJson<int>(videoId),
+      'timestampSeconds': serializer.toJson<int>(timestampSeconds),
+      'noteText': serializer.toJson<String>(noteText),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  VideoNote copyWith(
+          {int? id,
+          int? videoId,
+          int? timestampSeconds,
+          String? noteText,
+          DateTime? createdAt}) =>
+      VideoNote(
+        id: id ?? this.id,
+        videoId: videoId ?? this.videoId,
+        timestampSeconds: timestampSeconds ?? this.timestampSeconds,
+        noteText: noteText ?? this.noteText,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('VideoNote(')
+          ..write('id: $id, ')
+          ..write('videoId: $videoId, ')
+          ..write('timestampSeconds: $timestampSeconds, ')
+          ..write('noteText: $noteText, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, videoId, timestampSeconds, noteText, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VideoNote &&
+          other.id == this.id &&
+          other.videoId == this.videoId &&
+          other.timestampSeconds == this.timestampSeconds &&
+          other.noteText == this.noteText &&
+          other.createdAt == this.createdAt);
+}
+
+class VideoNotesCompanion extends UpdateCompanion<VideoNote> {
+  final Value<int> id;
+  final Value<int> videoId;
+  final Value<int> timestampSeconds;
+  final Value<String> noteText;
+  final Value<DateTime> createdAt;
+  const VideoNotesCompanion({
+    this.id = const Value.absent(),
+    this.videoId = const Value.absent(),
+    this.timestampSeconds = const Value.absent(),
+    this.noteText = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  VideoNotesCompanion.insert({
+    this.id = const Value.absent(),
+    required int videoId,
+    required int timestampSeconds,
+    required String noteText,
+    this.createdAt = const Value.absent(),
+  })  : videoId = Value(videoId),
+        timestampSeconds = Value(timestampSeconds),
+        noteText = Value(noteText);
+  static Insertable<VideoNote> custom({
+    Expression<int>? id,
+    Expression<int>? videoId,
+    Expression<int>? timestampSeconds,
+    Expression<String>? noteText,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (videoId != null) 'video_id': videoId,
+      if (timestampSeconds != null) 'timestamp_seconds': timestampSeconds,
+      if (noteText != null) 'note_text': noteText,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  VideoNotesCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? videoId,
+      Value<int>? timestampSeconds,
+      Value<String>? noteText,
+      Value<DateTime>? createdAt}) {
+    return VideoNotesCompanion(
+      id: id ?? this.id,
+      videoId: videoId ?? this.videoId,
+      timestampSeconds: timestampSeconds ?? this.timestampSeconds,
+      noteText: noteText ?? this.noteText,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (videoId.present) {
+      map['video_id'] = Variable<int>(videoId.value);
+    }
+    if (timestampSeconds.present) {
+      map['timestamp_seconds'] = Variable<int>(timestampSeconds.value);
+    }
+    if (noteText.present) {
+      map['note_text'] = Variable<String>(noteText.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VideoNotesCompanion(')
+          ..write('id: $id, ')
+          ..write('videoId: $videoId, ')
+          ..write('timestampSeconds: $timestampSeconds, ')
+          ..write('noteText: $noteText, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   late final $VideosTable videos = $VideosTable(this);
   late final $PlaylistsTable playlists = $PlaylistsTable(this);
   late final $RecentsTable recents = $RecentsTable(this);
   late final $CategoriesTable categories = $CategoriesTable(this);
+  late final $VideoNotesTable videoNotes = $VideoNotesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [videos, playlists, recents, categories];
+      [videos, playlists, recents, categories, videoNotes];
 }

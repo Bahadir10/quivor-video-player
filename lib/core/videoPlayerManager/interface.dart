@@ -21,6 +21,9 @@ abstract class IVideoPlayerManager {
   FV setAudioTrack(String trackId);
   FV setSubtitleTrack(String trackId);
   FV loadExternalSubtitle(String subtitlePath);
+  FV setSubtitleOffset(double offsetSeconds);
+  FV toggleFullscreen();
+  FV setSeekDuration(int seconds);
 
   Duration get duration;
   Duration get position;

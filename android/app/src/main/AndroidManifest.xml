@@ -3,6 +3,12 @@
         android:label="Quivor"
         android:name="${applicationName}"
         android:icon="@mipmap/quivor">
+        
+        <!-- Support for 16 KB page sizes (Android 15+) -->
+        <property
+            android:name="android.app.16kb_page_size"
+            android:value="supported" />
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"

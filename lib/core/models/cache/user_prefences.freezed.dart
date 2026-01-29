@@ -19,6 +19,7 @@ mixin _$UserPrefrences {
   double get volume => throw _privateConstructorUsedError;
   AutoPlayMode get autoPlayMode => throw _privateConstructorUsedError;
   int get earlyTransitionSeconds => throw _privateConstructorUsedError;
+  int get seekDurationSeconds => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $UserPrefrencesCopyWith<UserPrefrences> get copyWith =>
@@ -32,7 +33,10 @@ abstract class $UserPrefrencesCopyWith<$Res> {
       _$UserPrefrencesCopyWithImpl<$Res, UserPrefrences>;
   @useResult
   $Res call(
-      {double volume, AutoPlayMode autoPlayMode, int earlyTransitionSeconds});
+      {double volume,
+      AutoPlayMode autoPlayMode,
+      int earlyTransitionSeconds,
+      int seekDurationSeconds});
 }
 
 /// @nodoc
@@ -51,6 +55,7 @@ class _$UserPrefrencesCopyWithImpl<$Res, $Val extends UserPrefrences>
     Object? volume = null,
     Object? autoPlayMode = null,
     Object? earlyTransitionSeconds = null,
+    Object? seekDurationSeconds = null,
   }) {
     return _then(_value.copyWith(
       volume: null == volume
@@ -65,6 +70,10 @@ class _$UserPrefrencesCopyWithImpl<$Res, $Val extends UserPrefrences>
           ? _value.earlyTransitionSeconds
           : earlyTransitionSeconds // ignore: cast_nullable_to_non_nullable
               as int,
+      seekDurationSeconds: null == seekDurationSeconds
+          ? _value.seekDurationSeconds
+          : seekDurationSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -78,7 +87,10 @@ abstract class _$$UserPrefrencesImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {double volume, AutoPlayMode autoPlayMode, int earlyTransitionSeconds});
+      {double volume,
+      AutoPlayMode autoPlayMode,
+      int earlyTransitionSeconds,
+      int seekDurationSeconds});
 }
 
 /// @nodoc
@@ -95,6 +107,7 @@ class __$$UserPrefrencesImplCopyWithImpl<$Res>
     Object? volume = null,
     Object? autoPlayMode = null,
     Object? earlyTransitionSeconds = null,
+    Object? seekDurationSeconds = null,
   }) {
     return _then(_$UserPrefrencesImpl(
       volume: null == volume
@@ -109,6 +122,10 @@ class __$$UserPrefrencesImplCopyWithImpl<$Res>
           ? _value.earlyTransitionSeconds
           : earlyTransitionSeconds // ignore: cast_nullable_to_non_nullable
               as int,
+      seekDurationSeconds: null == seekDurationSeconds
+          ? _value.seekDurationSeconds
+          : seekDurationSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -119,7 +136,8 @@ class _$UserPrefrencesImpl implements _UserPrefrences {
   _$UserPrefrencesImpl(
       {required this.volume,
       this.autoPlayMode = AutoPlayMode.early,
-      this.earlyTransitionSeconds = 15});
+      this.earlyTransitionSeconds = 15,
+      this.seekDurationSeconds = 10});
 
   @override
   final double volume;
@@ -129,10 +147,13 @@ class _$UserPrefrencesImpl implements _UserPrefrences {
   @override
   @JsonKey()
   final int earlyTransitionSeconds;
+  @override
+  @JsonKey()
+  final int seekDurationSeconds;
 
   @override
   String toString() {
-    return 'UserPrefrences(volume: $volume, autoPlayMode: $autoPlayMode, earlyTransitionSeconds: $earlyTransitionSeconds)';
+    return 'UserPrefrences(volume: $volume, autoPlayMode: $autoPlayMode, earlyTransitionSeconds: $earlyTransitionSeconds, seekDurationSeconds: $seekDurationSeconds)';
   }
 
   @override
@@ -144,12 +165,14 @@ class _$UserPrefrencesImpl implements _UserPrefrences {
             (identical(other.autoPlayMode, autoPlayMode) ||
                 other.autoPlayMode == autoPlayMode) &&
             (identical(other.earlyTransitionSeconds, earlyTransitionSeconds) ||
-                other.earlyTransitionSeconds == earlyTransitionSeconds));
+                other.earlyTransitionSeconds == earlyTransitionSeconds) &&
+            (identical(other.seekDurationSeconds, seekDurationSeconds) ||
+                other.seekDurationSeconds == seekDurationSeconds));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, volume, autoPlayMode, earlyTransitionSeconds);
+  int get hashCode => Object.hash(runtimeType, volume, autoPlayMode,
+      earlyTransitionSeconds, seekDurationSeconds);
 
   @JsonKey(ignore: true)
   @override
@@ -163,7 +186,8 @@ abstract class _UserPrefrences implements UserPrefrences {
   factory _UserPrefrences(
       {required final double volume,
       final AutoPlayMode autoPlayMode,
-      final int earlyTransitionSeconds}) = _$UserPrefrencesImpl;
+      final int earlyTransitionSeconds,
+      final int seekDurationSeconds}) = _$UserPrefrencesImpl;
 
   @override
   double get volume;
@@ -171,6 +195,8 @@ abstract class _UserPrefrences implements UserPrefrences {
   AutoPlayMode get autoPlayMode;
   @override
   int get earlyTransitionSeconds;
+  @override
+  int get seekDurationSeconds;
   @override
   @JsonKey(ignore: true)
   _$$UserPrefrencesImplCopyWith<_$UserPrefrencesImpl> get copyWith =>

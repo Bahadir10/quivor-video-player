@@ -81,4 +81,27 @@ final class _ScreenCubit extends BaseCubit<PlaylistScreenState> {
     await getIt<IVideoService>().removeVideo(entity.id);
     emit(state.copyWith(videos: videos, isLoading: false));
   }
+
+  FV startOver() async {
+    emit(state.copyWith(isLoading: true));
+
+    // Mark all videos as unwatched
+    for (int i = 0; i < videos.length; i++) {
+      final updatedVideo = videos[i].copyWith(isWatched: false);
+      await getIt<IVideoService>().updateVideo(updatedVideo);
+      videos[i] = updatedVideo;
+    }
+
+    // Update playlist progress
+    final updatedPlaylist = playlist.copyWith(
+      watchedCount: 0,
+      progressPercentage: 0.0,
+    );
+
+    emit(state.copyWith(
+      videos: videos,
+      playlist: updatedPlaylist,
+      isLoading: false,
+    ));
+  }
 }

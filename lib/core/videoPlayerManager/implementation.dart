@@ -13,6 +13,8 @@ class VideoPlayerManager extends IVideoPlayerManager {
     _player,
   );
 
+  int _seekDuration = 10; // Default 10 seconds
+
   @override
   FV dispose() async {
     await _player.dispose();
@@ -45,10 +47,19 @@ class VideoPlayerManager extends IVideoPlayerManager {
   FV open(List<VideoEntity> videos) async {
     try {
       logger.info('Opening playlist with ${videos.length} videos');
-      final playable = Playlist(videos.map((x) => Media(x.path)).toList());
+      final playable = Playlist(
+        videos.map((x) => Media(x.path)).toList(),
+        // Disable auto-play next video - we handle this manually
+        index: 0,
+      );
       await _player.open(playable);
+
+      // Set playlist mode to none to completely disable auto-advance
+      await _player.setPlaylistMode(PlaylistMode.none);
+
       _player.setSubtitleTrack(SubtitleTrack.no());
-      logger.info('Playlist opened successfully');
+      logger.info(
+          'Playlist opened successfully with none mode (no auto-advance)');
     } catch (e, stackTrace) {
       errorHandler.handleError('VideoPlayerManager open', e, stackTrace);
       rethrow;
@@ -62,14 +73,16 @@ class VideoPlayerManager extends IVideoPlayerManager {
 
   @override
   FV seekBackward() async {
-    final x = _player.state.position.inSeconds + moveValue;
-    await _player.seek(Duration(seconds: x));
+    final x = _player.state.position.inSeconds - _seekDuration;
+    await _player
+        .seek(Duration(seconds: x.clamp(0, _player.state.duration.inSeconds)));
   }
 
   @override
   FV seekForward() async {
-    final x = _player.state.position.inSeconds + moveValue;
-    await _player.seek(Duration(seconds: x));
+    final x = _player.state.position.inSeconds + _seekDuration;
+    await _player
+        .seek(Duration(seconds: x.clamp(0, _player.state.duration.inSeconds)));
   }
 
   @override
@@ -181,6 +194,35 @@ class VideoPlayerManager extends IVideoPlayerManager {
           'VideoPlayerManager loadExternalSubtitle', e, stackTrace);
       rethrow;
     }
+  }
+
+  @override
+  FV setSubtitleOffset(double offsetSeconds) async {
+    try {
+      logger.info('Setting subtitle offset: ${offsetSeconds}s');
+      // media_kit doesn't have built-in subtitle delay support
+      // This is a placeholder - subtitle offset will be stored in database
+      // and can be used for custom subtitle rendering in the future
+      logger.warning(
+          'Subtitle offset feature requires custom subtitle rendering implementation');
+    } catch (e, stackTrace) {
+      errorHandler.handleError(
+          'VideoPlayerManager setSubtitleOffset', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  FV toggleFullscreen() async {
+    // Fullscreen is typically handled by the UI layer
+    // This is a placeholder for platform-specific implementations
+    logger.info('Fullscreen toggle requested - handle in UI layer');
+  }
+
+  @override
+  FV setSeekDuration(int seconds) async {
+    _seekDuration = seconds;
+    logger.info('Seek duration set to: ${seconds}s');
   }
 
   @override

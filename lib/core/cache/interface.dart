@@ -9,6 +9,7 @@ abstract class ICacheManager {
   FV setUserVolumeSelection(double volume);
   FV setAutoPlayMode(String mode);
   FV setEarlyTransitionSeconds(int seconds);
+  FV setSeekDurationSeconds(int seconds);
 
   factory ICacheManager.scoped() => CacheManager();
 }

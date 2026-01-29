@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:quivor/core/service/env/env_config_service.dart';
 import 'package:quivor/core/service/opensubtitles/implementation.dart';
@@ -7,6 +9,8 @@ import 'package:quivor/widgets/modern_input.dart';
 import 'package:app_materials/app_materials.dart';
 import 'package:quivor/core/extensions/build_context.dart';
 import 'package:quivor/core/enum/route.dart';
+import 'package:quivor/core/localization/localization_service.dart';
+import 'package:quivor/views/settings/widgets/keyboard_shortcuts_settings.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -172,6 +176,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Widget _buildLanguageOption(
+    BuildContext context, {
+    required Locale locale,
+    required String flag,
+    required String name,
+  }) {
+    final currentLocale = localizationService.getCurrentLocale(context);
+    final isSelected = currentLocale.languageCode == locale.languageCode;
+
+    return InkWell(
+      onTap: () async {
+        await localizationService.setLocale(context, locale);
+        setState(() {}); // Refresh to show selected state
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Colors.blue.withValues(alpha: 0.1)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color:
+                isSelected ? Colors.blue : Colors.grey.withValues(alpha: 0.3),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(
+              flag,
+              style: const TextStyle(fontSize: 24),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              name,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: Colors.blue,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _usernameController.dispose();
@@ -195,6 +253,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Language Selection Card
+            ModernCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.language, color: Colors.blue),
+                      SizedBox(width: 12),
+                      Text(
+                        'Dil / Language',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildLanguageOption(
+                    context,
+                    locale: const Locale('tr'),
+                    flag: '🇹🇷',
+                    name: 'Türkçe',
+                  ),
+                  const SizedBox(height: 8),
+                  _buildLanguageOption(
+                    context,
+                    locale: const Locale('en'),
+                    flag: '🇬🇧',
+                    name: 'English',
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Keyboard Shortcuts Section (Desktop only)
+            if (!Platform.isAndroid && !Platform.isIOS) ...[
+              const KeyboardShortcutsSettings(),
+              const SizedBox(height: 24),
+            ],
+
             // Status Card
             ModernCard(
               child: Column(

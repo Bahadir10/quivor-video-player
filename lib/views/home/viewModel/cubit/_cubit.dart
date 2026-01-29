@@ -75,6 +75,7 @@ final class _ScreenCubit extends BaseCubit<HomeScreenState> {
         paths: videos,
         mainPath: playlist.name,
         startIndex: startIndex >= 0 ? startIndex : 0,
+        playlistId: playlist.id,
       ),
     );
   }

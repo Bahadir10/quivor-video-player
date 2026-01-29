@@ -1,0 +1,29 @@
+🎉 New Features v1.4.0
+
+⌨️ Keyboard Shortcuts
+• Full keyboard control (Space, Arrow keys, etc.)
+• Customizable shortcuts in Settings
+• Hands-free video control
+
+⏱️ Subtitle Synchronization
+• Adjust subtitle timing (-5s to +5s)
+• Separate offset per video
+• Auto-save settings
+
+🎬 Adjustable Seek Duration
+• Choose from 5, 10, 15, 30, or 60 seconds
+• Works with keyboard and buttons
+• Preferences saved automatically
+
+📝 Video Notes (Udemy-Style)
+• Add timestamped notes to videos
+• Click notes to jump to that moment
+• Separate notes per video
+• Perfect for studying and review
+
+🐛 Bug Fixes
+• Fixed keyboard shortcuts errors
+• Fixed seek backward direction
+• Performance improvements
+
+📚 Check in-app help for more information!

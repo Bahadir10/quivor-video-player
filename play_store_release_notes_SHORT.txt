@@ -1,0 +1,19 @@
+🎉 New in v1.4.0
+
+⌨️ Keyboard Shortcuts - Full control with customizable keys
+⏱️ Subtitle Sync - Adjust timing per video (-5s to +5s)
+🎬 Seek Duration - Choose 5, 10, 15, 30, or 60 seconds
+📝 Video Notes - Add timestamped notes like Udemy
+
+🐛 Bug fixes and performance improvements
+
+---
+
+🎉 v1.4.0 Yenilikleri
+
+⌨️ Klavye Kısayolları - Özelleştirilebilir tam kontrol
+⏱️ Altyazı Senkronizasyonu - Video başına ayarlama
+🎬 Sarma Süresi - 5, 10, 15, 30 veya 60 saniye
+📝 Video Notları - Udemy gibi zaman damgalı notlar
+
+🐛 Hata düzeltmeleri ve performans iyileştirmeleri

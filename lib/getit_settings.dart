@@ -8,8 +8,10 @@ import 'package:quivor/core/fileManager/interface.dart';
 
 import 'package:quivor/core/service/interface/playlist.dart';
 import 'package:quivor/core/service/interface/video.dart';
+import 'package:quivor/core/service/interface/video_note.dart';
 import 'package:quivor/core/service/drift/playlist.dart';
 import 'package:quivor/core/service/drift/video.dart';
+import 'package:quivor/core/service/drift/video_note.dart';
 import 'package:quivor/intialize.dart';
 import 'package:quivor/views/createPlaylist/create_playlist.dart';
 import 'package:quivor/views/home/home.dart';
@@ -26,6 +28,7 @@ final class GetitSettings {
       // SERVICE
       ..registerSingleton<IPlaylistService>(DriftPlaylistService(database))
       ..registerSingleton<IVideoService>(DriftVideoService(database))
+      ..registerSingleton<IVideoNoteService>(DriftVideoNoteService(database))
       ..registerSingleton<IFileManager>(FileManager())
       // CUBITS
       ..registerSingleton<RecentVideosCubit>(RecentVideosCubit()..init())

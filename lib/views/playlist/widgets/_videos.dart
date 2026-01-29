@@ -94,7 +94,8 @@ class _VideosField extends StatelessWidget {
                       data: PlayScreenParameters(
                           paths: videos,
                           mainPath: playlist.name,
-                          startIndex: index));
+                          startIndex: index,
+                          playlistId: playlist.id));
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: Padding(

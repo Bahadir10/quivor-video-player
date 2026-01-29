@@ -28,6 +28,8 @@ mixin _$PlayScreenState {
   AutoPlayMode get autoPlayMode => throw _privateConstructorUsedError;
   int get earlyTransitionSeconds => throw _privateConstructorUsedError;
   bool get hasAutoTransitioned => throw _privateConstructorUsedError;
+  int get seekDurationSeconds => throw _privateConstructorUsedError;
+  bool get showNotes => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $PlayScreenStateCopyWith<PlayScreenState> get copyWith =>
@@ -52,7 +54,9 @@ abstract class $PlayScreenStateCopyWith<$Res> {
       bool showNextEpisode,
       AutoPlayMode autoPlayMode,
       int earlyTransitionSeconds,
-      bool hasAutoTransitioned});
+      bool hasAutoTransitioned,
+      int seekDurationSeconds,
+      bool showNotes});
 }
 
 /// @nodoc
@@ -80,6 +84,8 @@ class _$PlayScreenStateCopyWithImpl<$Res, $Val extends PlayScreenState>
     Object? autoPlayMode = null,
     Object? earlyTransitionSeconds = null,
     Object? hasAutoTransitioned = null,
+    Object? seekDurationSeconds = null,
+    Object? showNotes = null,
   }) {
     return _then(_value.copyWith(
       videos: null == videos
@@ -130,6 +136,14 @@ class _$PlayScreenStateCopyWithImpl<$Res, $Val extends PlayScreenState>
           ? _value.hasAutoTransitioned
           : hasAutoTransitioned // ignore: cast_nullable_to_non_nullable
               as bool,
+      seekDurationSeconds: null == seekDurationSeconds
+          ? _value.seekDurationSeconds
+          : seekDurationSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      showNotes: null == showNotes
+          ? _value.showNotes
+          : showNotes // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -154,7 +168,9 @@ abstract class _$$$PlayScreenStateImplImplCopyWith<$Res>
       bool showNextEpisode,
       AutoPlayMode autoPlayMode,
       int earlyTransitionSeconds,
-      bool hasAutoTransitioned});
+      bool hasAutoTransitioned,
+      int seekDurationSeconds,
+      bool showNotes});
 }
 
 /// @nodoc
@@ -180,6 +196,8 @@ class __$$$PlayScreenStateImplImplCopyWithImpl<$Res>
     Object? autoPlayMode = null,
     Object? earlyTransitionSeconds = null,
     Object? hasAutoTransitioned = null,
+    Object? seekDurationSeconds = null,
+    Object? showNotes = null,
   }) {
     return _then(_$$PlayScreenStateImplImpl(
       videos: null == videos
@@ -230,6 +248,14 @@ class __$$$PlayScreenStateImplImplCopyWithImpl<$Res>
           ? _value.hasAutoTransitioned
           : hasAutoTransitioned // ignore: cast_nullable_to_non_nullable
               as bool,
+      seekDurationSeconds: null == seekDurationSeconds
+          ? _value.seekDurationSeconds
+          : seekDurationSeconds // ignore: cast_nullable_to_non_nullable
+              as int,
+      showNotes: null == showNotes
+          ? _value.showNotes
+          : showNotes // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -249,7 +275,9 @@ class _$$PlayScreenStateImplImpl implements _$PlayScreenStateImpl {
       this.showNextEpisode = false,
       this.autoPlayMode = AutoPlayMode.early,
       this.earlyTransitionSeconds = 15,
-      this.hasAutoTransitioned = false})
+      this.hasAutoTransitioned = false,
+      this.seekDurationSeconds = 10,
+      this.showNotes = false})
       : _videos = videos;
 
   final List<VideoEntity> _videos;
@@ -292,10 +320,16 @@ class _$$PlayScreenStateImplImpl implements _$PlayScreenStateImpl {
   @override
   @JsonKey()
   final bool hasAutoTransitioned;
+  @override
+  @JsonKey()
+  final int seekDurationSeconds;
+  @override
+  @JsonKey()
+  final bool showNotes;
 
   @override
   String toString() {
-    return 'PlayScreenState(videos: $videos, isLoading: $isLoading, canPlayNext: $canPlayNext, canPlayPrevious: $canPlayPrevious, currentPlaying: $currentPlaying, volume: $volume, isPlaying: $isPlaying, isSideBarOpen: $isSideBarOpen, showNextEpisode: $showNextEpisode, autoPlayMode: $autoPlayMode, earlyTransitionSeconds: $earlyTransitionSeconds, hasAutoTransitioned: $hasAutoTransitioned)';
+    return 'PlayScreenState(videos: $videos, isLoading: $isLoading, canPlayNext: $canPlayNext, canPlayPrevious: $canPlayPrevious, currentPlaying: $currentPlaying, volume: $volume, isPlaying: $isPlaying, isSideBarOpen: $isSideBarOpen, showNextEpisode: $showNextEpisode, autoPlayMode: $autoPlayMode, earlyTransitionSeconds: $earlyTransitionSeconds, hasAutoTransitioned: $hasAutoTransitioned, seekDurationSeconds: $seekDurationSeconds, showNotes: $showNotes)';
   }
 
   @override
@@ -324,7 +358,11 @@ class _$$PlayScreenStateImplImpl implements _$PlayScreenStateImpl {
             (identical(other.earlyTransitionSeconds, earlyTransitionSeconds) ||
                 other.earlyTransitionSeconds == earlyTransitionSeconds) &&
             (identical(other.hasAutoTransitioned, hasAutoTransitioned) ||
-                other.hasAutoTransitioned == hasAutoTransitioned));
+                other.hasAutoTransitioned == hasAutoTransitioned) &&
+            (identical(other.seekDurationSeconds, seekDurationSeconds) ||
+                other.seekDurationSeconds == seekDurationSeconds) &&
+            (identical(other.showNotes, showNotes) ||
+                other.showNotes == showNotes));
   }
 
   @override
@@ -341,7 +379,9 @@ class _$$PlayScreenStateImplImpl implements _$PlayScreenStateImpl {
       showNextEpisode,
       autoPlayMode,
       earlyTransitionSeconds,
-      hasAutoTransitioned);
+      hasAutoTransitioned,
+      seekDurationSeconds,
+      showNotes);
 
   @JsonKey(ignore: true)
   @override
@@ -365,7 +405,9 @@ abstract class _$PlayScreenStateImpl implements PlayScreenState {
       final bool showNextEpisode,
       final AutoPlayMode autoPlayMode,
       final int earlyTransitionSeconds,
-      final bool hasAutoTransitioned}) = _$$PlayScreenStateImplImpl;
+      final bool hasAutoTransitioned,
+      final int seekDurationSeconds,
+      final bool showNotes}) = _$$PlayScreenStateImplImpl;
 
   @override
   List<VideoEntity> get videos;
@@ -391,6 +433,10 @@ abstract class _$PlayScreenStateImpl implements PlayScreenState {
   int get earlyTransitionSeconds;
   @override
   bool get hasAutoTransitioned;
+  @override
+  int get seekDurationSeconds;
+  @override
+  bool get showNotes;
   @override
   @JsonKey(ignore: true)
   _$$$PlayScreenStateImplImplCopyWith<_$$PlayScreenStateImplImpl>

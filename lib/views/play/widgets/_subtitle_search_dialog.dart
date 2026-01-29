@@ -1,13 +1,11 @@
 part of '../play.dart';
 
 class _SubtitleSearchDialog extends StatefulWidget {
-  final String videoPath;
-  final String videoName;
+  final VideoEntity video;
   final IVideoPlayerManager playerManager;
 
   const _SubtitleSearchDialog({
-    required this.videoPath,
-    required this.videoName,
+    required this.video,
     required this.playerManager,
   });
 
@@ -53,14 +51,15 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
       List<SubtitleSearchResult> results;
 
       if (_searchByHash) {
-        final hash = await _subtitleService.calculateFileHash(widget.videoPath);
+        final hash =
+            await _subtitleService.calculateFileHash(widget.video.path);
         results = await _subtitleService.searchByHash(
           hash,
           language: _selectedLanguage,
         );
       } else {
         results = await _subtitleService.searchByFileName(
-          widget.videoName,
+          widget.video.name,
           language: _selectedLanguage,
         );
       }
@@ -77,20 +76,17 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Error'),
+            title: Text(LocaleKeys.subtitle_error.tr()),
             content: SingleChildScrollView(
               child: Text(
-                'Error searching subtitles:\n\n$e\n\nPlease check:\n'
-                '1. Your API key is valid\n'
-                '2. You have internet connection\n'
-                '3. API rate limits not exceeded',
+                '${LocaleKeys.subtitle_error.tr()}:\n\n$e',
                 style: const TextStyle(fontSize: 12),
               ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+                child: Text(LocaleKeys.common_ok.tr()),
               ),
             ],
           ),
@@ -104,14 +100,18 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
       logger.debug('Starting download for subtitle: ${subtitle.fileName}');
       logger.debug('File ID: ${subtitle.downloadUrl}');
 
-      final tempDir = await getTemporaryDirectory();
-      final savePath = path.join(tempDir.path, subtitle.fileName);
+      // Save subtitle in the same directory as the video
+      final videoDir = path.dirname(widget.video.path);
+      final videoBaseName = path.basenameWithoutExtension(widget.video.path);
+      final subtitleExt = path.extension(subtitle.fileName);
+      final savePath = path.join(videoDir, '$videoBaseName${subtitleExt}');
 
       // Show loading
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Downloading ${subtitle.fileName}...'),
+            content: Text(LocaleKeys.subtitle_downloading
+                .tr(namedArgs: {'fileName': subtitle.fileName})),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -122,6 +122,20 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
 
       logger.info('Subtitle downloaded to: $savePath');
 
+      // Add to video's downloaded subtitles list and set as last selected
+      final updatedSubtitles =
+          List<String>.from(widget.video.downloadedSubtitles);
+      if (!updatedSubtitles.contains(savePath)) {
+        updatedSubtitles.add(savePath);
+      }
+
+      final updatedVideo = widget.video.copyWith(
+        downloadedSubtitles: updatedSubtitles,
+        lastSelectedSubtitle: savePath,
+      );
+      await getIt<IVideoService>().updateVideo(updatedVideo);
+      logger.info('Subtitle path saved to database and set as last selected');
+
       // Load into player
       await widget.playerManager.loadExternalSubtitle(savePath);
 
@@ -129,10 +143,10 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Subtitle loaded successfully! ✓'),
+          SnackBar(
+            content: Text(LocaleKeys.subtitle_downloaded.tr()),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
         Navigator.of(context).pop();
@@ -144,11 +158,11 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: AppColors.black2,
-            title: const Row(
+            title: Row(
               children: [
-                Icon(Icons.error_outline, color: Colors.red),
-                SizedBox(width: 8),
-                Text('Download Failed'),
+                const Icon(Icons.error_outline, color: Colors.red),
+                const SizedBox(width: 8),
+                Text(LocaleKeys.subtitle_download_failed.tr()),
               ],
             ),
             content: SingleChildScrollView(
@@ -156,20 +170,20 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Error: $e'),
+                  Text('${LocaleKeys.subtitle_error.tr()}: $e'),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Possible reasons:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    LocaleKeys.subtitle_possible_reasons.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text('• Download limit exceeded (200/day)'),
-                  const Text('• Invalid API key'),
-                  const Text('• Network connection issue'),
+                  Text('• ${LocaleKeys.subtitle_limit_exceeded.tr()}'),
+                  Text('• ${LocaleKeys.subtitle_invalid_api_key.tr()}'),
+                  Text('• ${LocaleKeys.subtitle_network_issue.tr()}'),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Try using "Load Local File" instead.',
-                    style: TextStyle(fontStyle: FontStyle.italic),
+                  Text(
+                    LocaleKeys.subtitle_try_local.tr(),
+                    style: const TextStyle(fontStyle: FontStyle.italic),
                   ),
                 ],
               ),
@@ -177,7 +191,7 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+                child: Text(LocaleKeys.common_ok.tr()),
               ),
             ],
           ),
@@ -204,7 +218,7 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Search Subtitles',
+                    LocaleKeys.subtitle_search.tr(),
                     style: AppTypography.headingMedium,
                   ),
                 ),
@@ -227,7 +241,7 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Video: ${widget.videoName}',
+                    'Video: ${widget.video.name}',
                     style: AppTypography.bodyMedium,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -258,7 +272,7 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
                       ElevatedButton.icon(
                         onPressed: _searchSubtitles,
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Refresh'),
+                        label: Text(LocaleKeys.common_refresh.tr()),
                       ),
                     ],
                   ),
@@ -272,7 +286,7 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
                           _searchSubtitles();
                         },
                       ),
-                      const Text('Search by file hash (more accurate)'),
+                      Text(LocaleKeys.subtitle_search_by_hash.tr()),
                     ],
                   ),
                 ],
@@ -293,12 +307,12 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
                                   size: 64, color: AppColors.grey1),
                               const SizedBox(height: 16),
                               Text(
-                                'No subtitles found',
+                                LocaleKeys.subtitle_no_results.tr(),
                                 style: AppTypography.bodyLarge,
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Try changing the language or search method',
+                                LocaleKeys.subtitle_try_different.tr(),
                                 style: AppTypography.bodySmall
                                     .copyWith(color: AppColors.grey1),
                               ),
@@ -315,7 +329,7 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
                                 color: AppColors.black1,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: AppColors.grey1.withOpacity(0.2),
+                                  color: AppColors.grey1.withValues(alpha: 0.2),
                                 ),
                               ),
                               child: Material(
@@ -335,7 +349,7 @@ class _SubtitleSearchDialogState extends State<_SubtitleSearchDialog> {
                                           ),
                                           decoration: BoxDecoration(
                                             color: AppColors.white1
-                                                .withOpacity(0.1),
+                                                .withValues(alpha: 0.1),
                                             borderRadius:
                                                 BorderRadius.circular(4),
                                           ),

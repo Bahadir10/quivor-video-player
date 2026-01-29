@@ -1,0 +1,178 @@
+═══════════════════════════════════════════════════════════════════
+                    QUIVOR VIDEO PLAYER
+                        CHANGELOG
+═══════════════════════════════════════════════════════════════════
+
+Version 1.4.0 (2026-01-25)
+═══════════════════════════════════════════════════════════════════
+
+🎉 NEW FEATURES
+
+  ⌨️  Keyboard Shortcuts
+      ✓ Full keyboard control for video playback
+      ✓ Customizable shortcuts in Settings
+      ✓ Default shortcuts:
+        - Space/K: Play/Pause
+        - ←/J: Seek Backward
+        - →/L: Seek Forward
+        - ↑/↓: Volume Control
+        - M: Toggle Mute
+        - F: Toggle Fullscreen
+        - N/P: Next/Previous Video
+      ✓ Focus management for keyboard events
+      ✓ Visual feedback for active shortcuts
+
+  ⏱️  Subtitle Synchronization
+      ✓ Adjust subtitle timing per video
+      ✓ Quick adjustment buttons:
+        - -5s: Delay by 5 seconds
+        - -0.5s: Delay by 0.5 seconds
+        - Reset: Back to 0
+        - +0.5s: Speed up by 0.5 seconds
+        - +5s: Speed up by 5 seconds
+      ✓ Per-video offset storage
+      ✓ Automatic loading of saved offsets
+      ✓ Real-time subtitle adjustment
+      ✓ Visual offset indicator
+
+  🎬 Adjustable Seek Duration
+      ✓ Choose from 5 duration options:
+        - 5 seconds (precise navigation)
+        - 10 seconds (default)
+        - 15 seconds (moderate skips)
+        - 30 seconds (large skips)
+        - 60 seconds (very large skips)
+      ✓ Applies to keyboard shortcuts
+      ✓ Applies to seek buttons
+      ✓ Dynamic icon updates showing current duration
+      ✓ Settings persist across sessions
+
+  📝 Video Notes (Udemy-Style)
+      ✓ Add timestamped notes while watching
+      ✓ Automatic timestamp capture
+      ✓ Click notes to jump to that moment
+      ✓ Per-video note storage
+      ✓ Beautiful side panel UI (350px)
+      ✓ Add note dialog with text input
+      ✓ Delete notes functionality
+      ✓ Empty state UI
+      ✓ Formatted timestamps (HH:MM:SS or MM:SS)
+      ✓ Notes sorted by timestamp
+      ✓ Persistent storage in database
+
+🐛 BUG FIXES
+
+  ✓ Fixed keyboard shortcuts ProviderNotFoundException
+  ✓ Fixed seek backward direction (was going forward)
+  ✓ Fixed dispose method async issue
+  ✓ Fixed deprecated withOpacity calls (now using withValues)
+  ✓ Fixed provider access in keyboard event handler
+
+🔧 TECHNICAL IMPROVEMENTS
+
+  Database:
+    ✓ Schema migration v5 → v7
+    ✓ Added video_notes table
+    ✓ Added subtitle_offset field to videos
+    ✓ Foreign key constraints for notes
+    ✓ Automatic migration on startup
+
+  Architecture:
+    ✓ Created IVideoNoteService interface
+    ✓ Implemented DriftVideoNoteService
+    ✓ Added KeyboardShortcutsService (singleton)
+    ✓ Improved state management with Bloc/Cubit
+    ✓ Enhanced error handling
+    ✓ Comprehensive logging
+
+  UI/UX:
+    ✓ New notes panel widget
+    ✓ Improved bottom bar controls
+    ✓ Dynamic seek duration icons
+    ✓ Better focus management
+    ✓ Consistent theming
+
+  Localization:
+    ✓ Added 70+ new translation keys
+    ✓ Full Turkish support
+    ✓ Full English support
+    ✓ All new features localized
+
+📚 DOCUMENTATION
+
+  ✓ VIDEO_NOTES_FEATURE.md - Technical documentation
+  ✓ SUBTITLE_SYNC_FEATURE.md - Subtitle sync guide
+  ✓ TESTING_GUIDE.md - Comprehensive testing guide
+  ✓ NEW_FEATURES_QUICK_START.md - User quick start
+  ✓ FEATURES_README.md - Features overview
+  ✓ DEPLOYMENT_CHECKLIST.md - Deployment guide
+  ✓ SESSION_SUMMARY.md - Development summary
+  ✓ Updated LINKEDIN_POST.md
+
+📊 STATISTICS
+
+  ✓ Files Modified: 12
+  ✓ Files Created: 17 (code + docs)
+  ✓ Lines of Code Added: ~1200+
+  ✓ Translation Keys: 70+
+  ✓ Database Migrations: 2
+  ✓ Features Implemented: 4
+
+═══════════════════════════════════════════════════════════════════
+
+Version 1.1.0 (Previous Release)
+═══════════════════════════════════════════════════════════════════
+
+🎉 NEW FEATURES
+
+  ✓ Playlist management
+  ✓ Auto-play modes (Manual, On Complete, Early, Auto)
+  ✓ OpenSubtitles integration
+  ✓ Continue watching from last position
+  ✓ Multiple audio tracks support
+  ✓ Playback speed control
+  ✓ Volume control
+  ✓ Fullscreen mode
+
+🐛 BUG FIXES
+
+  ✓ Various stability improvements
+  ✓ Performance optimizations
+
+═══════════════════════════════════════════════════════════════════
+
+Version 1.0.0 (Initial Release)
+═══════════════════════════════════════════════════════════════════
+
+🎉 INITIAL FEATURES
+
+  ✓ Local video playback
+  ✓ Basic subtitle support
+  ✓ Dark theme
+  ✓ Turkish & English localization
+
+═══════════════════════════════════════════════════════════════════
+
+UPCOMING FEATURES (Planned)
+═══════════════════════════════════════════════════════════════════
+
+  📝 Video Notes Enhancements:
+    - Edit existing notes
+    - Export notes to file
+    - Search within notes
+    - Note categories/tags
+    - Timeline markers for notes
+
+  🎬 General Improvements:
+    - Cloud sync for notes
+    - Collaborative notes
+    - Rich text formatting
+    - Note sharing
+    - More keyboard shortcuts
+
+═══════════════════════════════════════════════════════════════════
+
+For more information, visit:
+https://github.com/Bahadir10/quivor-video-player
+
+═══════════════════════════════════════════════════════════════════

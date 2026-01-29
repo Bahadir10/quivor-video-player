@@ -11,6 +11,7 @@ final class CacheManager extends ICacheManager {
     final volume = prefs.getDouble('volume');
     final autoPlayModeString = prefs.getString('autoPlayMode');
     final earlyTransitionSeconds = prefs.getInt('earlyTransitionSeconds');
+    final seekDurationSeconds = prefs.getInt('seekDurationSeconds');
 
     // Parse auto play mode from string
     AutoPlayMode autoPlayMode = AutoPlayMode.early;
@@ -29,6 +30,7 @@ final class CacheManager extends ICacheManager {
       volume: volume ?? 80,
       autoPlayMode: autoPlayMode,
       earlyTransitionSeconds: earlyTransitionSeconds ?? 15,
+      seekDurationSeconds: seekDurationSeconds ?? 10,
     );
   }
 
@@ -48,5 +50,11 @@ final class CacheManager extends ICacheManager {
   FV setEarlyTransitionSeconds(int seconds) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt('earlyTransitionSeconds', seconds);
+  }
+
+  @override
+  FV setSeekDurationSeconds(int seconds) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('seekDurationSeconds', seconds);
   }
 }

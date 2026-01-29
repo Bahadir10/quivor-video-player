@@ -40,6 +40,12 @@ final class UserDataManager {
     await cacheManager.setEarlyTransitionSeconds(seconds);
   }
 
+  FV setSeekDurationSeconds(int seconds) async {
+    final x = await userPrefrences;
+    _userPref = x.copyWith(seekDurationSeconds: seconds);
+    await cacheManager.setSeekDurationSeconds(seconds);
+  }
+
   Future<UserPrefrences> get userPrefrences async =>
       _userPref ??= await cacheManager.getUserPrefrences();
 }
